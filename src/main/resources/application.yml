@@ -1,0 +1,48 @@
+spring:
+  application:
+    name: api-barberia
+  
+  # ========================================
+  # PERFIL ACTIVO (dev = desarrollo, prod = producción)
+  # ========================================
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+  
+  # ========================================
+  # CONFIGURACIÓN DE BASE DE DATOS
+  # ========================================
+  # IMPORTANTE: En producción usa variables de entorno
+  # ${DB_HOST:localhost} = Lee de variable de entorno DB_HOST, si no existe usa "localhost"
+  datasource:
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:barberia_db}?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:12345678}
+    driver-class-name: com.mysql.cj.jdbc.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    show-sql: ${SHOW_SQL:true}
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+
+# ========================================
+# JWT SEGURIDAD
+# ========================================
+# ⚠️ CRÍTICO: NUNCA expongas la clave secreta en el código
+# En producción SIEMPRE usa variables de entorno
+jwt:
+  secret-key: ${JWT_SECRET_KEY:404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970}
+  expiration: ${JWT_EXPIRATION:86400000}  # 24 horas en milisegundos
+  
+  # ========================================
+  # INICIALIZACIÓN DE DATOS SQL (OPCIONAL)
+  # ========================================
+  # Si quieres usar scripts SQL en vez de DataInitializer:
+  # Descomenta estas líneas y comenta @Component en DataInitializer.java
+  # sql:
+  #   init:
+  #     mode: never  # always, never, embedded
+  #     schema-locations: classpath:sql/schema.sql
+  #     data-locations: classpath:sql/data.sql
