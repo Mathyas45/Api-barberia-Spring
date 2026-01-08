@@ -22,7 +22,7 @@ import java.util.Map;
  * 
  * BENEFICIOS:
  * 1. Centraliza el manejo de errores
- * 2. Evita try-catch en cada controller
+ * 2. Evita try-catch in cada controller
  * 3. Respuestas consistentes
  * 4. Oculta detalles internos al cliente
  */
@@ -100,18 +100,49 @@ public class GlobalExceptionHandler {
     }
     
     /**
+     * Maneja IllegalArgumentException (como negocio no encontrado)
+     */
+    @ExceptionHandler(IllegalArgumentException.class)
+    public ResponseEntity<Map<String, Object>> handleIllegalArgument(IllegalArgumentException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("timestamp", LocalDateTime.now());
+        response.put("status", HttpStatus.BAD_REQUEST.value());
+        response.put("error", "Argumento inválido");
+        response.put("message", ex.getMessage());
+        
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+    
+    /**
+     * Maneja NonUniqueResultException
+     * 
+     * Se lanza cuando una consulta devuelve múltiples resultados
+     */
+    @ExceptionHandler(jakarta.persistence.NonUniqueResultException.class)
+    public ResponseEntity<Map<String, Object>> handleNonUniqueResultException(jakarta.persistence.NonUniqueResultException ex) {
+        Map<String, Object> response = new HashMap<>();
+        response.put("timestamp", LocalDateTime.now());
+        response.put("status", HttpStatus.BAD_REQUEST.value());
+        response.put("error", "Error de consulta");
+        response.put("message", "Se encontraron múltiples resultados para la consulta. Verifique los datos.");
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(response);
+    }
+    
+    /**
      * Maneja cualquier otra excepción no contemplada
      */
     @ExceptionHandler(Exception.class)
     public ResponseEntity<Map<String, Object>> handleGlobalException(Exception ex) {
+        // Imprimir el stack trace en los logs para debugging
+        ex.printStackTrace();
+        
         Map<String, Object> response = new HashMap<>();
         response.put("timestamp", LocalDateTime.now());
         response.put("status", HttpStatus.INTERNAL_SERVER_ERROR.value());
         response.put("error", "Error interno del servidor");
-        response.put("message", "Ha ocurrido un error inesperado");
-        
-        // En desarrollo puedes mostrar el mensaje real:
-        // response.put("debug", ex.getMessage());
+        response.put("message", ex.getMessage()); // Mostrar mensaje real
+        response.put("type", ex.getClass().getSimpleName()); // Tipo de excepción
         
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
     }

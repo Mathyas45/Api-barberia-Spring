@@ -24,6 +24,23 @@ public class ClienteService {
     }
 
     @Transactional
+    public ClienteResponse createClienteProtegido (ClienteRequest request) {
+        Cliente cliente = clienteMapper.toEntity(request);
+        if(cliente.getTelefono().length()   != 9 ){
+            throw new RuntimeException("El teléfono debe tener 9 dígitos.");
+        }
+        // Verificar si el cliente ya existe por telefono
+        List<Cliente> clientesExistentes = clienteRepository.findClientesByTelefono(cliente.getTelefono());
+        if (clientesExistentes.size() > 1) {
+            throw new RuntimeException("Se encontraron múltiples clientes con el mismo teléfono. Verifique los datos.");
+        } else if (!clientesExistentes.isEmpty()) {
+            throw new RuntimeException("El teléfono ya está registrado para otro cliente.");
+        }
+        Cliente nuevoCliente =  clienteRepository.save(cliente);
+        return clienteMapper.toResponse(nuevoCliente);
+    }
+
+    @Transactional
     public ClienteResponse create(ClienteRequest request) {
         Cliente cliente = clienteMapper.toEntity(request);
         // Verificar si el cliente ya existe por documentoIdentidad

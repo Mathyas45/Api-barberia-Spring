@@ -67,7 +67,7 @@ public class JwtService {
      * 
      * ⚠️ PRODUCCIÓN: Usar AWS Secrets Manager, Azure Key Vault, o similar
      */
-    @Value("${jwt.secret.key:#{null}}")
+    @Value("${jwt.secret-key:#{null}}")
     private String secretKey;
     
     /**
@@ -98,8 +98,7 @@ public class JwtService {
         // Valida que la clave secreta esté configurada
         if (!StringUtils.hasText(secretKey)) {
             log.warn("⚠️ JWT_SECRET_KEY no configurada, usando clave por defecto (NO USAR EN PRODUCCIÓN)");
-            // Usar la clave por defecto del application.yml
-            secretKey = "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970";
+            return;
         }
         
         // Valida que la clave tenga longitud suficiente (mínimo 256 bits = 43 caracteres en Base64)
@@ -179,6 +178,28 @@ public class JwtService {
     }
     
     /**
+     * Extrae el usuarioId del token JWT
+     * 
+     * @param token JWT del que extraer el usuarioId
+     * @return ID del usuario
+     */
+    public Long extractUsuarioId(String token) {
+        Claims claims = extractAllClaims(token);
+        Object usuarioIdObj = claims.get("usuarioId");
+
+        if (usuarioIdObj == null) {
+            return null;
+        }
+
+        // Convertir a Long (puede venir como Integer desde el JSON)
+        if (usuarioIdObj instanceof Number) {
+            return ((Number) usuarioIdObj).longValue();
+        }
+
+        return null;
+    }
+    
+    /**
      * Extrae un claim específico del token
      * 
      * Claims: Son los datos almacenados en el payload del JWT
@@ -210,11 +231,14 @@ public class JwtService {
      * @param negocioId ID del negocio del usuario (MULTI-TENANT)
      * @return Token JWT firmado con negocioId incluido
      */
-    public String generateToken(UserDetails userDetails, Long negocioId) {
+    public String generateToken(UserDetails userDetails, Long negocioId, Long usuarioId) {
         Map<String, Object> extraClaims = new HashMap<>();
         
         // MULTI-TENANT: Agregar negocioId al token
         extraClaims.put("negocioId", negocioId);
+
+        //agregamos el id_usuario al token
+        extraClaims.put("usuarioId", usuarioId);
         
         // Agregamos los roles y permisos como claims
         extraClaims.put("roles", userDetails.getAuthorities().stream()

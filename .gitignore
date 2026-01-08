@@ -41,3 +41,8 @@ application-local.properties
 *.key
 *.pem
 *.p12
+# Opcional si creas variables personalizadas
+*.secret.yml
+*.env.yml
+*.credentials.yml
+*.md

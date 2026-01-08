@@ -6,7 +6,7 @@ spring:
   # PERFIL ACTIVO (dev = desarrollo, prod = producción)
   # ========================================
   profiles:
-    active: ${SPRING_PROFILES_ACTIVE:dev}
+    active: ${SPRING_PROFILES_ACTIVE:produccion}
   
   # ========================================
   # CONFIGURACIÓN DE BASE DE DATOS

@@ -1,0 +1,64 @@
+package com.barberia.models;
+
+import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.math.BigDecimal;
+import java.time.LocalDateTime;
+
+@Entity
+@Table(name = "servicios")
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class Servicio {
+
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+
+    @Column(length = 150, nullable = false)
+    private String nombre;
+
+    @Column(columnDefinition = "TEXT")
+    private String descripcion;
+
+    @Column(name = "duracion_minutos_aprox")
+    private Integer duracionMinutosAprox;
+
+    @Column(nullable = false)
+    private Double precio;
+
+    @Column(length = 100)
+    private String categoria;
+
+    @Column(nullable = false, name = "reg_estado")
+    private Integer regEstado;
+
+    @CreationTimestamp
+    @Column(name = "created_at", updatable = false)
+    private LocalDateTime createdAt;
+
+    @Column(name = "updated_at")
+    private LocalDateTime updatedAt;
+
+    // Este método se ejecuta automáticamente ANTES de cada UPDATE
+    @PreUpdate
+    public void onPreUpdate() {
+        this.updatedAt = LocalDateTime.now();
+    }
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "negocio_id", nullable = false)
+    private Negocio negocio;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_registro", nullable = false)
+    private Usuario usuarioRegistroId;
+}
+

@@ -1,0 +1,76 @@
+package com.barberia.mappers;
+
+import com.barberia.dto.servicio.ServicioRequest;
+import com.barberia.dto.servicio.ServicioResponse;
+import com.barberia.dto.servicio.ServicioUpdateRequest;
+import com.barberia.models.Negocio;
+import com.barberia.models.Servicio;
+import com.barberia.models.Usuario;
+import com.barberia.repositories.NegocioRepository;
+import com.barberia.repositories.ServicioRepository;
+import com.barberia.repositories.UsuarioRepository;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+
+@Component
+// sirve para que spring lo detecte como un bean es decir un componente gestionado por el contenedor de spring
+public class ServicioMapper {
+
+    @Autowired
+    private NegocioRepository negocioRepository;
+    @Autowired
+    private UsuarioRepository usuarioRepository;
+
+    public Servicio toEntity(ServicioRequest request) {
+        Servicio servicio = new Servicio();
+        servicio.setNombre(request.getNombre());
+        servicio.setDescripcion(request.getDescripcion());
+        servicio.setCategoria(request.getCategoria());
+        servicio.setPrecio(request.getPrecio());
+        servicio.setDuracionMinutosAprox(request.getDuracionMinutos());
+        servicio.setRegEstado(1); // Por defecto activo
+        //        Verificar y asignar el usuario de registro
+        Usuario usuarioRegistro = usuarioRepository.findById(request.getUsuarioRegistroId())
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con ID: " + request.getUsuarioRegistroId()));
+        servicio.setUsuarioRegistroId(usuarioRegistro);
+        // Convertir negocioId a un objeto Negocio
+        Negocio negocio = negocioRepository.findById(request.getNegocioId())
+                .orElseThrow(() -> new IllegalArgumentException("Negocio no encontrado con ID: " + request.getNegocioId()));
+        servicio.setNegocio(negocio);
+
+        return servicio;
+    }
+
+    public ServicioResponse toResponse(Servicio servicio) {
+        ServicioResponse response = new ServicioResponse(); // esto sirve para crear una nueva instancia de la clase ServicioResponse, la instancia es un objeto que representa la respuesta del servicio en el sistema
+        response.setId(servicio.getId());
+        response.setNombre(servicio.getNombre());
+        response.setDescripcion(servicio.getDescripcion());
+        response.setCategoria(servicio.getCategoria());
+        response.setPrecio(servicio.getPrecio());
+        response.setRegEstado(servicio.getRegEstado());
+        response.setDuracionMinutos(servicio.getDuracionMinutosAprox());
+        if(servicio.getUsuarioRegistroId() != null) {
+            response.setUsuarioRegistroId(servicio.getUsuarioRegistroId().getId());
+        }
+        if (servicio.getNegocio() != null) {
+            response.setNegocioId(servicio.getNegocio().getId());
+        }
+        return response;
+    }
+
+    public Servicio updateEntity(Servicio servicio, ServicioUpdateRequest request) {
+        servicio.setNombre(request.getNombre());
+        servicio.setDescripcion(request.getDescripcion());
+        servicio.setCategoria(request.getCategoria());
+        servicio.setPrecio(request.getPrecio());
+        servicio.setDuracionMinutosAprox(request.getDuracionMinutos());
+        servicio.setRegEstado(2); // Por defecto activo
+        // Verificar y asignar el usuario de registro
+        Usuario usuarioRegistro = usuarioRepository.findById(request.getUsuarioRegistroId())
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con ID: " + request.getUsuarioRegistroId()));
+        servicio.setUsuarioRegistroId(usuarioRegistro);
+        return servicio;
+    }
+
+}

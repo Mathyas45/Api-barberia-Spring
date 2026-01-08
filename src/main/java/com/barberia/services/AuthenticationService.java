@@ -250,7 +250,7 @@ public class AuthenticationService {
                 .build();
         
         // MULTI-TENANT: Generar token con negocioId incluido
-        String jwtToken = jwtService.generateToken(userDetails, userWithRoles.getNegocioId());
+        String jwtToken = jwtService.generateToken(userDetails, userWithRoles.getNegocioId(), usuario.getId());
         
         // ═══════════════════════════════════════════════════════════════════
         // PASO 7: CONSTRUIR RESPUESTA (CON NEGOCIO_ID)
@@ -431,7 +431,7 @@ public class AuthenticationService {
                 .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
         
         // MULTI-TENANT: Generar token con negocioId incluido
-        String jwtToken = jwtService.generateToken(userDetails, usuario.getNegocioId());
+        String jwtToken = jwtService.generateToken(userDetails, usuario.getNegocioId(), usuario.getId());
         
         // ═══════════════════════════════════════════════════════════════════
         // PASO 4: CONSTRUIR RESPUESTA (CON NEGOCIO_ID)
