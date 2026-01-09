@@ -70,5 +70,8 @@ public class RegisterRequest {
      */
     @NotNull(message = "El negocioId es obligatorio")
     private Long negocioId;
+
+    private Long usuarioRegistroId;
+
 }
 

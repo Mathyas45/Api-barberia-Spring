@@ -1,6 +1,7 @@
 package com.barberia.services;
 
 import com.barberia.dto.cliente.ClienteRequest;
+import com.barberia.dto.cliente.ClienteRequestCliente;
 import com.barberia.dto.cliente.ClienteResponse;
 import com.barberia.mappers.ClienteMapper;
 import com.barberia.models.Cliente;
@@ -41,8 +42,8 @@ public class ClienteService {
     }
 
     @Transactional
-    public ClienteResponse create(ClienteRequest request) {
-        Cliente cliente = clienteMapper.toEntity(request);
+    public ClienteResponse create(ClienteRequestCliente request) {
+        Cliente cliente = clienteMapper.toEntityCliente(request);
         // Verificar si el cliente ya existe por documentoIdentidad
         Cliente clienteExistente = clienteRepository.findClienteByTelefono(cliente.getTelefono());
         if (clienteExistente != null) {

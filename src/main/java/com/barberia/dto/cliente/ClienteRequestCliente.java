@@ -6,7 +6,7 @@ import jakarta.validation.constraints.Size;
 import lombok.Data;
 
 @Data
-public class ClienteRequest {
+public class ClienteRequestCliente {
 
     @NotBlank(message = "El nombre es obligatorio")
     @Size(max = 255, message = "El nombre no puede exceder 255 caracteres")
@@ -22,9 +22,6 @@ public class ClienteRequest {
     @Size(max = 100, message = "El email no puede exceder 100 caracteres")
     public String email;
 
-    public Long usuarioRegistroId;
-
     @NotNull(message = "El negocioId es obligatorio")
     public Long negocioId;
-
 }

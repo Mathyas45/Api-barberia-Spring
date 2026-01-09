@@ -2,6 +2,7 @@ package com.barberia.controllers;
 
 import com.barberia.dto.ApiResponse;
 import com.barberia.dto.cliente.ClienteRequest;
+import com.barberia.dto.cliente.ClienteRequestCliente;
 import com.barberia.dto.cliente.ClienteResponse;
 import com.barberia.services.ClienteService;
 import jakarta.validation.Valid;
@@ -75,7 +76,7 @@ public class ClienteController {
     }
     @PostMapping({"registerCliente"})
     public ResponseEntity<ApiResponse<ClienteResponse>> createCliente(
-            @Valid @RequestBody ClienteRequest request) {
+            @Valid @RequestBody ClienteRequestCliente request) {
         try {
             ClienteResponse clienteResponse = clienteService.create(request);
             ApiResponse<ClienteResponse> response = ApiResponse.<ClienteResponse>builder()
@@ -203,6 +204,5 @@ public class ClienteController {
                     .build());
         }
     }
-
 
 }

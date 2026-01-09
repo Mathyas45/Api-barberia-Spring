@@ -186,13 +186,18 @@ public class AuthenticationService {
         //
         // MULTI-TENANT:
         // ⚠️ SIEMPRE asignar negocioId al crear usuario
-        
+        //        Verificar y asignar el usuario de registro
+        Usuario usuarioRegistro = usuarioRepository.findById(request.getUsuarioRegistroId())
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con ID: " + request.getUsuarioRegistroId()));
+
+
         Usuario usuario = Usuario.builder()
                 .name(request.getName())
                 .email(request.getEmail())
                 .password(passwordEncoder.encode(request.getPassword()))  // ← ENCRIPTADO
                 .negocioId(request.getNegocioId())  // ← MULTI-TENANT
                 .regEstado(1)  // 1 = Activo, 0 = Inactivo
+                .usuarioRegistroId(usuarioRegistro)
                 .roles(Set.of(assignedRole))  // ← Asigna el rol determinado dinámicamente
                 .build();
         

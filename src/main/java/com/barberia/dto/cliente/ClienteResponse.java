@@ -10,4 +10,6 @@ public class ClienteResponse {
     public String documentoIdentidad;
     public String email;
     public Long negocioId;
+    public Long usuarioRegistroId;
+    public int regEstado;
 }

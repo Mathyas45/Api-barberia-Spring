@@ -84,6 +84,11 @@ public class Usuario {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_registro")
+    private Usuario usuarioRegistroId;
+
+
     /**
      * Relación Many-to-Many con Role
      *
