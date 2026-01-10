@@ -25,6 +25,7 @@ public class ProfesionalMapper {
         profesional.setDocumentoIdentidad(request.getDocumentoIdentidad());
         profesional.setFechaNacimiento(request.getFechaNacimiento());
         profesional.setTelefono(request.getTelefono());
+        profesional.setDireccion(request.getDireccion());
         //        Verificar y asignar el usuario de registro
         Usuario usuarioRegistro = usuarioRepository.findById(request.getUsuarioRegistroId())
                 .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con ID: " + request.getUsuarioRegistroId()));
@@ -45,12 +46,29 @@ public class ProfesionalMapper {
         response.setNombreCompleto(profesional.getNombreCompleto());
         response.setDocumentoIdentidad(profesional.getDocumentoIdentidad());
         response.setFechaNacimiento(profesional.getFechaNacimiento());
+        response.setDireccion(profesional.getDireccion());
         response.setTelefono(profesional.getTelefono());
+        response.setRegEstado(profesional.getRegEstado());
         if(profesional.getUsuarioRegistroId() != null) {
             response.setUsuarioRegistroId(profesional.getUsuarioRegistroId().getId());
         }
         if (profesional.getNegocio() != null) {
             response.setNegocioId(profesional.getNegocio().getId());
-        }        return response;
+        }
+
+        return response;
     }
+    public Profesional updateEntity(Profesional profesional, ProfesionalRequest request) {
+        profesional.setNombreCompleto(request.getNombreCompleto());
+        profesional.setDocumentoIdentidad(request.getDocumentoIdentidad());
+        profesional.setFechaNacimiento(request.getFechaNacimiento());
+        profesional.setTelefono(request.getTelefono());
+        profesional.setDireccion(request.getDireccion());
+        profesional.setRegEstado(2); // Por defecto activo
+        Usuario usuarioRegistro = usuarioRepository.findById(request.getUsuarioRegistroId())
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con ID: " + request.getUsuarioRegistroId()));
+        profesional.setUsuarioRegistroId(usuarioRegistro);
+        return profesional;
+    }
+
 }

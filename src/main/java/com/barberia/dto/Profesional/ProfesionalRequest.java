@@ -26,6 +26,4 @@ public class ProfesionalRequest {
 
     public Long negocioId;
 
-
-
 }

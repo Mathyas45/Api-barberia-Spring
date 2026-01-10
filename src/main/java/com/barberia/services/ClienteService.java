@@ -66,7 +66,8 @@ public class ClienteService {
         String nombreCompleto = query;
         String documentoIdentidad = query;
         String telefono = query;
-        if (nombreCompleto != null && !documentoIdentidad.isBlank()) {
+
+        if (nombreCompleto != null && !documentoIdentidad.isBlank() && !telefono.isBlank()) {
             clientes = clienteRepository.findByNombreCompletoContainingIgnoreCaseOrDocumentoIdentidadOrTelefonoContainingIgnoreCase(nombreCompleto, documentoIdentidad, telefono);
         } else {
             clientes = clienteRepository.findAll();

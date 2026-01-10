@@ -47,7 +47,7 @@ public class Profesional {
     }
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "usuario_registro", nullable = false)
+    @JoinColumn(name = "usuario_registro")
     private Usuario usuarioRegistroId;
 
     @ManyToOne(fetch = FetchType.LAZY)

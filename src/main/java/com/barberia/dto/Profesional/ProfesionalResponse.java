@@ -10,6 +10,7 @@ public class ProfesionalResponse {
     public String nombreCompleto;
     public String documentoIdentidad;
     public LocalDate fechaNacimiento;
+    public Integer edad;
     public String telefono;
     public String direccion;
     public int regEstado;
