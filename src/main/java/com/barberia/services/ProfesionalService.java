@@ -6,22 +6,25 @@ import com.barberia.dto.Profesional.ProfesionalResponse;
 import com.barberia.mappers.ProfesionalMapper;
 import com.barberia.models.Profesional;
 import com.barberia.repositories.ProfesionalRepository;
+import com.barberia.services.common.FechaService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDate;
-import java.time.Period;
 import java.util.List;
 import java.util.stream.Collectors;
+
 
 @Service
 public class ProfesionalService {
     private final ProfesionalRepository profesionalRepository;
     private final ProfesionalMapper profesionalMapper;
+    private final FechaService fechaService;
 
-    public ProfesionalService(ProfesionalRepository profesionalRepository, ProfesionalMapper profesionalMapper) {
+
+    public ProfesionalService(ProfesionalRepository profesionalRepository, ProfesionalMapper profesionalMapper, FechaService fechaService) {
         this.profesionalRepository = profesionalRepository;
         this.profesionalMapper = profesionalMapper;
+        this.fechaService = fechaService;
     }
 
     @Transactional
@@ -41,9 +44,7 @@ public class ProfesionalService {
         ProfesionalResponse response = profesionalMapper.toResponse(profesional);
 
         if (profesional.getFechaNacimiento() != null) {
-            response.setEdad(
-                    Period.between(profesional.getFechaNacimiento(), LocalDate.now()).getYears()
-            );
+            response.setEdad(fechaService.calcularEdad(profesional.getFechaNacimiento()));//lama al servicio para calcular la edad
         }
         return response;
     }
@@ -58,9 +59,13 @@ public class ProfesionalService {
         }
 
         return profesionales.stream()
-                .map(profesionalMapper::toResponse)
+                .map(profesional-> {
+                        ProfesionalResponse response = profesionalMapper.toResponse(profesional);
+                        response.setEdad(fechaService.calcularEdad(profesional.getFechaNacimiento()));
+                        return response;
+                })
                 .collect(Collectors.toList()); //esto es para convertir la lista de entidades a lista de responses nos sirve para evitar codigo repetitivo
-        }
+    }
 
     @Transactional
     public ProfesionalResponse update(Long id, ProfesionalRequest request) {

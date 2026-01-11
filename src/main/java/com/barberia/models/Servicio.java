@@ -34,11 +34,13 @@ public class Servicio {
     @Column(nullable = false)
     private Double precio;
 
-    @Column(length = 100)
-    private String categoria;
-
     @Column(nullable = false, name = "reg_estado")
     private Integer regEstado;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "usuario_registro", nullable = false)
+    private Usuario usuarioRegistroId;
+
 
     @CreationTimestamp
     @Column(name = "created_at", updatable = false)
@@ -57,8 +59,13 @@ public class Servicio {
     @JoinColumn(name = "negocio_id", nullable = false)
     private Negocio negocio;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "usuario_registro", nullable = false)
-    private Usuario usuarioRegistroId;
+    @Column(length = 100)
+    private String categoria;
+
+//    @ManyToOne
+//    @JoinColumn(name = "categoria_id", nullable = false)
+//    private Categoria categoria;
+
+
 }
 

@@ -10,7 +10,7 @@ import java.util.List;
 @Repository
 public interface ProfesionalRepository  extends JpaRepository<Profesional, Long> {
 
-    @Query("SELECT COUNT(c) > 0 FROM Profesional c WHERE c.nombreCompleto like :nombreCompleto AND c.regEstado != 0")
+    @Query("SELECT COUNT(c) > 0 FROM Profesional c WHERE c.nombreCompleto = :nombreCompleto AND c.regEstado != 0")
     boolean existsByNombreAndRegEstadoNotEliminado(String nombreCompleto);
 
     List<Profesional> findByNombreCompletoContainingIgnoreCaseOrDocumentoIdentidadContainingIgnoreCase(String nombreCompleto, int regEstado);
