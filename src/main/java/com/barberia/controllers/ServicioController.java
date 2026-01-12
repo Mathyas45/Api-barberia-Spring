@@ -132,6 +132,26 @@ public class ServicioController {
         }
     }
 
+    @PutMapping("/eliminar/{id}")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('UPDATE_SERVICIOS')")
+    public ResponseEntity<ApiResponse<ServicioResponse>> eliminar(@PathVariable Long id) {
+        try {
+            ServicioResponse response = servicioService.eliminar(id);
+            return ResponseEntity.ok(ApiResponse.<ServicioResponse>builder()
+                    .code(201)
+                    .success(true)
+                    .message("Estado del servicio actualizado")
+                    .data(response)
+                    .build());
+        } catch (Exception e) {
+            return ResponseEntity.status(400).body(ApiResponse.<ServicioResponse>builder()
+                    .code(400)
+                    .success(false)
+                    .message("Error al actualizar el estado del servicio: " + e.getMessage())
+                    .build());
+
+        }
+    }
 
 
 

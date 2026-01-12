@@ -1,6 +1,8 @@
 package com.barberia.controllers;
 
 import com.barberia.dto.ApiResponse;
+import com.barberia.dto.EstadoRequestGlobal;
+import com.barberia.dto.Profesional.ProfesionalResponse;
 import com.barberia.dto.cliente.ClienteRequest;
 import com.barberia.dto.cliente.ClienteRequestCliente;
 import com.barberia.dto.cliente.ClienteResponse;
@@ -179,6 +181,31 @@ public class ClienteController {
         }
     }
 
+
+    @PutMapping("/estado/{id}")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<ClienteResponse>> cambiarEstado(@PathVariable Long id, @Valid @RequestBody EstadoRequestGlobal request) {
+        try {
+            ClienteResponse clienteResponse = clienteService.cambiarEstado(id, request);
+            return ResponseEntity.ok(
+                    ApiResponse.<ClienteResponse>builder()
+                            .code(200)
+                            .success(true)
+                            .message("Estado del Cliente actualizado exitosamente")
+                            .data(clienteResponse)
+                            .build()
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    ApiResponse.<ClienteResponse>builder()
+                            .code(400)
+                            .success(false)
+                            .message("Error al actualizar el estado del Cliente: " + e.getMessage())
+                            .build()
+            );
+        }
+    }
+
     /**
      * Eliminar cliente
      * 
@@ -186,22 +213,27 @@ public class ClienteController {
      * - Solo ADMIN puede eliminar
      * - Esta operación es crítica, por eso solo ADMIN
      */
-    @DeleteMapping("/delete/{id}")
+    @PutMapping("/delete/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<ClienteResponse>> eliminar(@PathVariable Long id) {
         try {
-            clienteService.delete(id);
-            return ResponseEntity.ok(ApiResponse.<Void>builder()
-                    .code(201)
-                    .success(true)
-                    .message("Cliente eliminado exitosamente")
-                    .build());
+            ClienteResponse clienteResponse = clienteService.eliminar(id);
+            return ResponseEntity.ok(
+                    ApiResponse.<ClienteResponse>builder()
+                            .code(200)
+                            .success(true)
+                            .message("Estado del Cliente actualizado exitosamente")
+                            .data(clienteResponse)
+                            .build()
+            );
         } catch (Exception e) {
-            return ResponseEntity.status(500).body(ApiResponse.<Void>builder()
-                    .code(400)
-                    .success(false)
-                    .message("Error al eliminar el cliente: " + e.getMessage())
-                    .build());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    ApiResponse.<ClienteResponse>builder()
+                            .code(400)
+                            .success(false)
+                            .message("Error al actualizar el estado del Cliente: " + e.getMessage())
+                            .build()
+            );
         }
     }
 

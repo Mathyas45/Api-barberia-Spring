@@ -1,10 +1,12 @@
 package com.barberia.services;
 
 import com.barberia.dto.EstadoRequestGlobal;
+import com.barberia.dto.Profesional.ProfesionalResponse;
 import com.barberia.dto.servicio.ServicioRequest;
 import com.barberia.dto.servicio.ServicioResponse;
 import com.barberia.dto.servicio.ServicioUpdateRequest;
 import com.barberia.mappers.ServicioMapper;
+import com.barberia.models.Profesional;
 import com.barberia.models.Servicio;
 import com.barberia.repositories.ServicioRepository;
 import org.springframework.stereotype.Service;
@@ -29,6 +31,11 @@ public class ServicioService {
     @Transactional
     public ServicioResponse create(ServicioRequest request) {
         Servicio servicio = servicioMapper.toEntity(request);
+
+        boolean  nombreServicioRepetido = servicioRepository.existsByNombreAndRegEstadoNotEliminado(servicio.getNombre());
+        if (nombreServicioRepetido) {
+            throw new RuntimeException("El nombre del servicio ya está registrado.");
+        }
 
         if(servicio.getPrecio() < 0){
             throw new RuntimeException("El precio no puede ser negativo.");
@@ -68,6 +75,15 @@ public class ServicioService {
         Servicio servicio = servicioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Servicio no encontrado con ID: " + id));
         servicio.setRegEstado(request.getRegEstado());
+        Servicio nuevoEstado =  servicioRepository.save(servicio);
+        return servicioMapper.toResponse(nuevoEstado);
+    }
+
+    @Transactional
+    public ServicioResponse eliminar(Long id) {
+        Servicio servicio = servicioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Servicio no encontrado con ID: " + id));
+        servicio.setRegEstado(0);
         Servicio nuevoEstado =  servicioRepository.save(servicio);
         return servicioMapper.toResponse(nuevoEstado);
     }

@@ -15,7 +15,5 @@ public interface ProfesionalRepository  extends JpaRepository<Profesional, Long>
 
     List<Profesional> findByNombreCompletoContainingIgnoreCaseOrDocumentoIdentidadContainingIgnoreCase(String nombreCompleto, int regEstado);
 
-
-
     List<Profesional> findByRegEstadoNot(int regEstado);
 }

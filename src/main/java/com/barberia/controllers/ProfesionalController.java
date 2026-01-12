@@ -141,11 +141,11 @@ public class ProfesionalController {
 
         }
     }
-    @PutMapping("/estado/eliminar/{id}")
+    @PutMapping("/eliminar/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('DELETE_PROFESSIONALS')")
-    public ResponseEntity<ApiResponse<ProfesionalResponse>> eliminar(@PathVariable Long id,    @Valid @RequestBody EstadoRequestGlobal request) {
+    public ResponseEntity<ApiResponse<ProfesionalResponse>> eliminar(@PathVariable Long id) {
         try {
-            ProfesionalResponse profesionalResponse = profesionalService.cambiarEstado(id, request);
+            ProfesionalResponse profesionalResponse = profesionalService.eliminar(id);
             return ResponseEntity.ok(
                     ApiResponse.<ProfesionalResponse>builder()
                             .code(200)
@@ -163,6 +163,5 @@ public class ProfesionalController {
                             .build()
             );
         }
-
     }
 }

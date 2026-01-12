@@ -84,4 +84,13 @@ public class ProfesionalService {
         Profesional actualizadoProfesional = profesionalRepository.save(profesional);
         return profesionalMapper.toResponse(actualizadoProfesional);
     }
+
+    @Transactional
+    public ProfesionalResponse eliminar(Long id) {
+        Profesional profesional = profesionalRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Profesional no encontrado con ID: " + id));
+        profesional.setRegEstado(0);
+        Profesional actualizadoProfesional = profesionalRepository.save(profesional);
+        return profesionalMapper.toResponse(actualizadoProfesional);
+    }
 }

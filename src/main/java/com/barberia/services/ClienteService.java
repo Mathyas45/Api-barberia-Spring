@@ -1,10 +1,13 @@
 package com.barberia.services;
 
+import com.barberia.dto.EstadoRequestGlobal;
+import com.barberia.dto.Profesional.ProfesionalResponse;
 import com.barberia.dto.cliente.ClienteRequest;
 import com.barberia.dto.cliente.ClienteRequestCliente;
 import com.barberia.dto.cliente.ClienteResponse;
 import com.barberia.mappers.ClienteMapper;
 import com.barberia.models.Cliente;
+import com.barberia.models.Profesional;
 import com.barberia.repositories.ClienteRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -89,9 +92,20 @@ public class ClienteService {
     }
 
     @Transactional
-    public void delete(Long id) {
+    public ClienteResponse cambiarEstado(Long id, EstadoRequestGlobal request) {
         Cliente cliente = clienteRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Cliente no encontrado con ID: " + id));
-        clienteRepository.delete(cliente);
+        cliente.setRegEstado(request.getRegEstado());
+        Cliente nuevoCliente = clienteRepository.save(cliente);
+        return clienteMapper.toResponse(nuevoCliente);
+    }
+
+    @Transactional
+    public ClienteResponse eliminar(Long id) {
+        Cliente cliente = clienteRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Cliente no encontrado con ID: " + id));
+        cliente.setRegEstado(0);
+        Cliente nuevoCliente = clienteRepository.save(cliente);
+        return clienteMapper.toResponse(nuevoCliente);
     }
 }

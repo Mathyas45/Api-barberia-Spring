@@ -1,38 +1,33 @@
 package com.barberia.models;
 
+import com.barberia.models.enums.DiaSemana;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 
 @Entity
-@Table(name = "servicios")
-@Data
-@Builder
-@NoArgsConstructor
-@AllArgsConstructor
-public class Servicio {
+@Table(name = "horarios_profesional")
+public class HorarioProfesional {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(length = 150, nullable = false)
-    private String nombre;
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "profesional_id", nullable = false)
+    private Profesional profesional;
 
-    @Column(columnDefinition = "TEXT")
-    private String descripcion;
-
-    @Column(name = "duracion_minutos_aprox")
-    private Integer duracionMinutosAprox;
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private DiaSemana diaSemana;
 
     @Column(nullable = false)
-    private Double precio;
+    private LocalTime horaInicio;
+
+    @Column(nullable = false)
+    private LocalTime horaFin;
 
     @Column(nullable = false, name = "reg_estado")
     private Integer regEstado;
@@ -54,14 +49,4 @@ public class Servicio {
         this.updatedAt = LocalDateTime.now();
     }
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "negocio_id", nullable = false)
-    private Negocio negocio;
-
-    @ManyToOne
-    @JoinColumn(name = "categoria_id", nullable = false)
-    private Categoria categoria;
-
-
 }
-

@@ -19,8 +19,7 @@ public class ServicioRequest {
 
     public Double precio;
 
-    @Size(max = 100, message = "La categoría no puede exceder 100 caracteres")
-    public String categoria;
+    public Long categoria;
 
     public Long usuarioRegistroId;
 

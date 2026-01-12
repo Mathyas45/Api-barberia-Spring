@@ -10,7 +10,7 @@ public class ServicioResponse {
     public String descripcion;
     public Integer duracionMinutos;
     public Double precio;
-    public String categoria;
+    public Long categoria;
     public Long usuarioRegistroId;
     public Long negocioId;
     public int regEstado;

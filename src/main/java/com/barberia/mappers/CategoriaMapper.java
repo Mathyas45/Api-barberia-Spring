@@ -43,6 +43,7 @@ public class CategoriaMapper {
         response.setNombre(categoria.getNombre());
         response.setDescripcion(categoria.getDescripcion());
         response.setCreatedAt(categoria.getCreatedAt());
+        response.setUpdatedAt(categoria.getUpdatedAt());
         if(categoria.getUsuarioRegistroId() != null) {
             response.setUsuarioRegistroId(categoria.getUsuarioRegistroId().getId());
         }
@@ -51,5 +52,16 @@ public class CategoriaMapper {
         }
         response.setRegEstado(categoria.getRegEstado());
         return response;
+    }
+
+    public  Categoria updateEntity(Categoria categoria, CategoriaRequest request) {
+        categoria.setNombre(request.getNombre());
+        categoria.setDescripcion(request.getDescripcion());
+
+        //        Verificar y asignar el usuario de modificación
+        Usuario usuarioModificacion = usuarioRepository.findById(request.getUsuarioRegistroId())
+                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con ID: " + request.getUsuarioRegistroId()));
+        categoria.setUsuarioRegistroId(usuarioModificacion);
+        return categoria;
     }
 }
