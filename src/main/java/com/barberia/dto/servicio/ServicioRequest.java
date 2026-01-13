@@ -21,8 +21,10 @@ public class ServicioRequest {
 
     public Long categoria;
 
-    public Long usuarioRegistroId;
+    // usuarioRegistroId ya NO es necesario - se captura automáticamente con @LastModifiedBy
+    // public Long usuarioRegistroId;
 
-    @NotNull(message = "El campo negocioId es obligatorio")
-    public Long negocioId;
+    // negocioId ya NO es necesario - se captura automáticamente con @CreatedBy del JWT
+    // @NotNull(message = "El campo negocioId es obligatorio")
+    // public Long negocioId;
 }

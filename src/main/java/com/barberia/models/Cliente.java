@@ -4,12 +4,16 @@ package com.barberia.models;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 
 @Data//esto es para generar los metodos get y set
 @Entity//esto es para indicar que es una entidad de base de datos
 @Table(name = "clientes")
+@EntityListeners({AuditingEntityListener.class, com.barberia.config.NegocioEntityListener.class})
 public class Cliente {
 
     @Id
@@ -44,22 +48,16 @@ public class Cliente {
         this.updatedAt = LocalDateTime.now();
     }
 
+    @CreatedBy
+    @LastModifiedBy
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_registro")
     private Usuario usuarioRegistroId;
 
-    /**
-     * Negocio (barbería / estética)
-     * Multi-tenant
-     */
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "negocio_id", nullable = false)
     private Negocio negocio;
 
-    /**
-     * Usuario asociado (opcional)
-     * Solo existe si el cliente crea una cuenta
-     */
     @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id")
     private Usuario usuario;

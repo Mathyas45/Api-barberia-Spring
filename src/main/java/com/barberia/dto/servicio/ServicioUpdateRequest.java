@@ -20,5 +20,6 @@ public class ServicioUpdateRequest {
 
     private Long categoria;
 
-    private Long usuarioRegistroId;
+    // usuarioRegistroId ya NO es necesario - se captura automáticamente con @LastModifiedBy
+    // private Long usuarioRegistroId;
 }

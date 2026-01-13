@@ -1,13 +1,11 @@
 package com.barberia.services;
 
 import com.barberia.dto.EstadoRequestGlobal;
-import com.barberia.dto.Profesional.ProfesionalResponse;
 import com.barberia.dto.cliente.ClienteRequest;
 import com.barberia.dto.cliente.ClienteRequestCliente;
 import com.barberia.dto.cliente.ClienteResponse;
 import com.barberia.mappers.ClienteMapper;
 import com.barberia.models.Cliente;
-import com.barberia.models.Profesional;
 import com.barberia.repositories.ClienteRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

@@ -2,13 +2,18 @@ package com.barberia.models;
 
 import com.barberia.models.enums.DiaSemana;
 import jakarta.persistence.*;
+import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-
+@Data//esto es para generar los metodos get y set
 @Entity
 @Table(name = "horarios_profesional")
+@EntityListeners({AuditingEntityListener.class, com.barberia.config.NegocioEntityListener.class})
 public class HorarioProfesional {
 
     @Id
@@ -32,6 +37,8 @@ public class HorarioProfesional {
     @Column(nullable = false, name = "reg_estado")
     private Integer regEstado;
 
+    @CreatedBy
+    @LastModifiedBy
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_registro", nullable = false)
     private Usuario usuarioRegistroId;
@@ -48,5 +55,10 @@ public class HorarioProfesional {
     public void onPreUpdate() {
         this.updatedAt = LocalDateTime.now();
     }
+
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "negocio_id", nullable = false)
+    private Negocio negocio;
+
 
 }

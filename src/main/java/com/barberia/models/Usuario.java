@@ -3,6 +3,9 @@ package com.barberia.models;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.HashSet;
@@ -34,6 +37,7 @@ import java.util.Set;
 @AllArgsConstructor
 @Entity
 @Table(name = "usuarios")
+@EntityListeners({AuditingEntityListener.class, com.barberia.config.NegocioEntityListener.class})
 public class Usuario {
 
     @Id
@@ -49,25 +53,9 @@ public class Usuario {
     @Column(nullable = false, length = 100)
     private String password;
     
-    /**
-     * MULTI-TENANT: ID del negocio al que pertenece este usuario
-     * 
-     * IMPORTANTE:
-     * - Este campo es OBLIGATORIO para todos los usuarios
-     * - Define qué barbería puede gestionar este usuario
-     * - Se usa como filtro en TODAS las consultas
-     * 
-     * EJEMPLOS:
-     * - negocio_id = 1 → Usuario de "Barbería El Estilo"
-     * - negocio_id = 2 → Usuario de "Barbería Corte Moderno"
-     */
     @Column(name = "negocio_id", nullable = false)
     private Long negocioId;
     
-    /**
-     * Relación con Negocio (Many-to-One)
-     * Un negocio tiene muchos usuarios
-     */
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "negocio_id", insertable = false, updatable = false)
     @ToString.Exclude
@@ -84,23 +72,19 @@ public class Usuario {
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
+    @CreatedBy
+    @LastModifiedBy
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_registro")
     private Usuario usuarioRegistroId;
 
-
-    /**
-     * Relación Many-to-Many con Role
-     *
-     * fetch = FetchType.EAGER: Carga los roles SIEMPRE que se carga el usuario
-     * (necesario para Spring Security)
-     */
     @ManyToMany(fetch = FetchType.EAGER, cascade = CascadeType.MERGE)
     @JoinTable(
             name = "user_roles",
             joinColumns = @JoinColumn(name = "usuario_id"),
             inverseJoinColumns = @JoinColumn(name = "rol_id")
     )
+
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     @Builder.Default

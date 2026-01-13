@@ -22,8 +22,9 @@ public class ProfesionalRequest {
 
     public String direccion;
 
-    public Long usuarioRegistroId;
+    // usuarioRegistroId ya NO es necesario - se captura automáticamente con @LastModifiedBy
+    // public Long usuarioRegistroId;
 
-    public Long negocioId;
-
+    // negocioId ya NO es necesario - se captura automáticamente con @CreatedBy del JWT
+    // public Long negocioId;
 }

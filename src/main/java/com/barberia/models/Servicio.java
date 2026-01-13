@@ -6,12 +6,16 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "servicios")
+@EntityListeners({AuditingEntityListener.class, com.barberia.config.NegocioEntityListener.class})
 @Data
 @Builder
 @NoArgsConstructor
@@ -37,6 +41,8 @@ public class Servicio {
     @Column(nullable = false, name = "reg_estado")
     private Integer regEstado;
 
+    @CreatedBy
+    @LastModifiedBy
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_registro", nullable = false)
     private Usuario usuarioRegistroId;
@@ -61,7 +67,6 @@ public class Servicio {
     @ManyToOne
     @JoinColumn(name = "categoria_id", nullable = false)
     private Categoria categoria;
-
 
 }
 

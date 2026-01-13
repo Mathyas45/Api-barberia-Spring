@@ -3,6 +3,9 @@ package com.barberia.models;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -11,6 +14,7 @@ import java.util.List;
 @Data//esto es para generar los metodos get y set
 @Entity//esto es para indicar que es una entidad de base de datos
 @Table(name = "categorias")
+@EntityListeners({AuditingEntityListener.class, com.barberia.config.NegocioEntityListener.class})//esto es para auditar quien creo o modifico el registro
 public class Categoria {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -38,14 +42,12 @@ public class Categoria {
         this.updatedAt = LocalDateTime.now();
     }
 
+    @CreatedBy
+    @LastModifiedBy
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_registro")
     private Usuario usuarioRegistroId;
 
-    /**
-     * Negocio (barbería / estética)
-     * Multi-tenant
-     */
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "negocio_id")
     private Negocio negocio;

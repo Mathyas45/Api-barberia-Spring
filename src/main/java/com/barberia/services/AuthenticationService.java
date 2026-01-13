@@ -197,7 +197,6 @@ public class AuthenticationService {
                 .password(passwordEncoder.encode(request.getPassword()))  // ← ENCRIPTADO
                 .negocioId(request.getNegocioId())  // ← MULTI-TENANT
                 .regEstado(1)  // 1 = Activo, 0 = Inactivo
-                .usuarioRegistroId(usuarioRegistro)
                 .roles(Set.of(assignedRole))  // ← Asigna el rol determinado dinámicamente
                 .build();
         

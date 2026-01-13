@@ -83,7 +83,6 @@ public class CategoriaService {
                 .orElseThrow(() -> new RuntimeException("Categoria no encontrado con ID: " + id));
 
         categoriaExistente.setRegEstado(0); // Establecer el estado a eliminado (0)
-
         Categoria categoriaActualizada = categoriaRepository.save(categoriaExistente);
         return categoriaMapper.toResponse(categoriaActualizada);
     }

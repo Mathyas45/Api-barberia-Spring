@@ -12,27 +12,11 @@ import org.springframework.stereotype.Component;
 
 @Component// sirve para que spring lo detecte como un bean es decir un componente gestionado por el contenedor de spring
 public class CategoriaMapper {
-    @Autowired
-    private NegocioRepository negocioRepository;
-    @Autowired
-    private UsuarioRepository usuarioRepository;
-
 
     public Categoria toEntity(CategoriaRequest request) {
         Categoria categoria = new Categoria(); // esto sirve para crear una nueva instancia de la clase Categoria, la instancia es un objeto que representa una categoria en el sistema
         categoria.setNombre(request.getNombre());
         categoria.setDescripcion(request.getDescripcion());
-
-        //        Verificar y asignar el usuario de registro
-        Usuario usuarioRegistro = usuarioRepository.findById(request.getUsuarioRegistroId())
-                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con ID: " + request.getUsuarioRegistroId()));
-        categoria.setUsuarioRegistroId(usuarioRegistro);
-
-        // Convertir negocioId a un objeto Negocio
-        Negocio negocio = negocioRepository.findById(request.getNegocioId())
-                .orElseThrow(() -> new IllegalArgumentException("Negocio no encontrado con ID: " + request.getNegocioId()));
-        categoria.setNegocio(negocio);
-
         categoria.setRegEstado(1); // Por defecto activo
         return categoria;
     }
@@ -57,11 +41,6 @@ public class CategoriaMapper {
     public  Categoria updateEntity(Categoria categoria, CategoriaRequest request) {
         categoria.setNombre(request.getNombre());
         categoria.setDescripcion(request.getDescripcion());
-
-        //        Verificar y asignar el usuario de modificación
-        Usuario usuarioModificacion = usuarioRepository.findById(request.getUsuarioRegistroId())
-                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con ID: " + request.getUsuarioRegistroId()));
-        categoria.setUsuarioRegistroId(usuarioModificacion);
         return categoria;
     }
 }

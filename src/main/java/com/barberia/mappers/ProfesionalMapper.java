@@ -26,16 +26,6 @@ public class ProfesionalMapper {
         profesional.setFechaNacimiento(request.getFechaNacimiento());
         profesional.setTelefono(request.getTelefono());
         profesional.setDireccion(request.getDireccion());
-        //        Verificar y asignar el usuario de registro
-        Usuario usuarioRegistro = usuarioRepository.findById(request.getUsuarioRegistroId())
-                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con ID: " + request.getUsuarioRegistroId()));
-        profesional.setUsuarioRegistroId(usuarioRegistro);
-
-        // Convertir negocioId a un objeto Negocio
-        Negocio negocio = negocioRepository.findById(request.getNegocioId())
-                .orElseThrow(() -> new IllegalArgumentException("Negocio no encontrado con ID: " + request.getNegocioId()));
-        profesional.setNegocio(negocio);
-
         profesional.setRegEstado(1); // Por defecto activo
         return profesional;
     }
@@ -64,10 +54,7 @@ public class ProfesionalMapper {
         profesional.setFechaNacimiento(request.getFechaNacimiento());
         profesional.setTelefono(request.getTelefono());
         profesional.setDireccion(request.getDireccion());
-        profesional.setRegEstado(2); // Por defecto activo
-        Usuario usuarioRegistro = usuarioRepository.findById(request.getUsuarioRegistroId())
-                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con ID: " + request.getUsuarioRegistroId()));
-        profesional.setUsuarioRegistroId(usuarioRegistro);
+        profesional.setRegEstado(2); // Por defecto actualizado
         return profesional;
     }
 

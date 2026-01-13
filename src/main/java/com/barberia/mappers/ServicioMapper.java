@@ -36,15 +36,7 @@ public class ServicioMapper {
         servicio.setPrecio(request.getPrecio());
         servicio.setDuracionMinutosAprox(request.getDuracionMinutos());
         servicio.setRegEstado(1); // Por defecto activo
-        //        Verificar y asignar el usuario de registro
-        Usuario usuarioRegistro = usuarioRepository.findById(request.getUsuarioRegistroId())
-                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con ID: " + request.getUsuarioRegistroId()));
-        servicio.setUsuarioRegistroId(usuarioRegistro);
-        // Convertir negocioId a un objeto Negocio
-        Negocio negocio = negocioRepository.findById(request.getNegocioId())
-                .orElseThrow(() -> new IllegalArgumentException("Negocio no encontrado con ID: " + request.getNegocioId()));
-        servicio.setNegocio(negocio);
-
+        
         return servicio;
     }
 
@@ -76,11 +68,12 @@ public class ServicioMapper {
         servicio.setCategoria(categoria);
         servicio.setPrecio(request.getPrecio());
         servicio.setDuracionMinutosAprox(request.getDuracionMinutos());
-        servicio.setRegEstado(2); // Por defecto activo
-        // Verificar y asignar el usuario de registro
-        Usuario usuarioRegistro = usuarioRepository.findById(request.getUsuarioRegistroId())
-                .orElseThrow(() -> new IllegalArgumentException("Usuario no encontrado con ID: " + request.getUsuarioRegistroId()));
-        servicio.setUsuarioRegistroId(usuarioRegistro);
+        servicio.setRegEstado(2); // Por defecto actualizado
+        
+        // usuarioRegistroId ya NO es necesario - se actualiza automáticamente con @LastModifiedBy
+        // Usuario usuarioRegistro = usuarioRepository.findById(request.getUsuarioRegistroId())...
+        // servicio.setUsuarioRegistroId(usuarioRegistro);
+        
         return servicio;
     }
 

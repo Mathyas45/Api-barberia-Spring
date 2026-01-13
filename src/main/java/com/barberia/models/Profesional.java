@@ -3,6 +3,9 @@ package com.barberia.models;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.data.annotation.LastModifiedBy;
+import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -10,6 +13,7 @@ import java.time.LocalDateTime;
 @Data//esto es para generar los metodos get y set
 @Entity
 @Table(name = "profesionales")
+@EntityListeners({AuditingEntityListener.class, com.barberia.config.NegocioEntityListener.class})
 public class Profesional {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -46,6 +50,8 @@ public class Profesional {
         this.updatedAt = LocalDateTime.now();
     }
 
+    @CreatedBy
+    @LastModifiedBy
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_registro")
     private Usuario usuarioRegistroId;
