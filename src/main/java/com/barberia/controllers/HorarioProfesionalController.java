@@ -2,6 +2,7 @@ package com.barberia.controllers;
 
 import com.barberia.dto.ApiResponse;
 import com.barberia.dto.EstadoRequestGlobal;
+import com.barberia.dto.HorarioProfesional.CopiarHorariosRequest;
 import com.barberia.dto.HorarioProfesional.HorarioProfesionalRequest;
 import com.barberia.dto.HorarioProfesional.HorarioProfesionalResponse;
 import com.barberia.models.enums.DiaSemana;
@@ -166,6 +167,27 @@ public class HorarioProfesionalController {
             );
         }
     }
-
+    @PostMapping("/copiarHorarios")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('CREATE_PROFESSIONAL_SCHEDULES')")
+    public ResponseEntity<ApiResponse<Void>> copiarHorarios(@RequestBody CopiarHorariosRequest request) {
+        try {
+            horarioProfesionalService.copiarHorarios(request);
+            return ResponseEntity.ok(
+                    ApiResponse.<Void>builder()
+                            .code(200)
+                            .success(true)
+                            .message("Horarios copiados exitosamente")
+                            .build()
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    ApiResponse.<Void>builder()
+                            .code(400)
+                            .success(false)
+                            .message("Error al copiar los horarios: " + e.getMessage())
+                            .build()
+            );
+        }
+    }
 
 }

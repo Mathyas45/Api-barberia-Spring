@@ -2,7 +2,6 @@ package com.barberia.mappers;
 
 import com.barberia.dto.HorarioProfesional.HorarioProfesionalRequest;
 import com.barberia.dto.HorarioProfesional.HorarioProfesionalResponse;
-import com.barberia.models.Categoria;
 import com.barberia.models.HorarioProfesional;
 import com.barberia.models.Profesional;
 import com.barberia.repositories.ProfesionalRepository;
@@ -23,6 +22,7 @@ public class HorarioProfesionalMapper {
         horario.setDiaSemana(request.getDiaSemana());
         horario.setHoraInicio(request.getHoraInicio());
         horario.setHoraFin(request.getHoraFin());
+        horario.setRegEstado(1); // Por defecto activo
         return horario;
     }
 

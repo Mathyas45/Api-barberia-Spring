@@ -1,6 +1,7 @@
 package com.barberia.services;
 
 import com.barberia.dto.EstadoRequestGlobal;
+import com.barberia.dto.HorarioProfesional.CopiarHorariosRequest;
 import com.barberia.dto.HorarioProfesional.HorarioProfesionalRequest;
 import com.barberia.dto.HorarioProfesional.HorarioProfesionalResponse;
 import com.barberia.mappers.HorarioProfesionalMapper;
@@ -97,6 +98,28 @@ public class HorarioProfesionalService {
         horarioProfesional.setRegEstado(0);
         HorarioProfesional actualizadoHorarioProfesional = horarioProfesionalRepository.save(horarioProfesional);
         return horarioProfesionalMapper.toResponse(actualizadoHorarioProfesional);
+    }
+
+    @Transactional
+    public void copiarHorarios(CopiarHorariosRequest request) {
+
+        List<HorarioProfesional> base = horarioProfesionalRepository.findByProfesionalAndDiaSemana(request.getProfesionalId(), request.getOrigen());
+
+        for (DiaSemana DiaDestino : request.getDestinos()) {
+
+            horarioProfesionalRepository.desactivarPorProfesionalYDiaSemana(request.getProfesionalId(), DiaDestino);
+
+            for (HorarioProfesional h : base) {
+                HorarioProfesional nuevo = new HorarioProfesional();
+                nuevo.setProfesional(h.getProfesional());
+                nuevo.setDiaSemana(DiaDestino);
+                nuevo.setHoraInicio(h.getHoraInicio());
+                nuevo.setHoraFin(h.getHoraFin());
+                nuevo.setRegEstado(1); // Activo
+
+                horarioProfesionalRepository.save(nuevo);
+            }
+        }
     }
 
 }
