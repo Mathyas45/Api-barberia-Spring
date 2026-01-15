@@ -26,6 +26,7 @@ public class ProfesionalMapper {
         profesional.setFechaNacimiento(request.getFechaNacimiento());
         profesional.setTelefono(request.getTelefono());
         profesional.setDireccion(request.getDireccion());
+        profesional.setUsaHorarioNegocio(request.getUsaHorarioNegocio());
         profesional.setRegEstado(1); // Por defecto activo
         return profesional;
     }
@@ -39,6 +40,7 @@ public class ProfesionalMapper {
         response.setDireccion(profesional.getDireccion());
         response.setTelefono(profesional.getTelefono());
         response.setRegEstado(profesional.getRegEstado());
+        response.setUsaHorarioNegocio(profesional.getUsaHorarioNegocio());
         if(profesional.getUsuarioRegistroId() != null) {
             response.setUsuarioRegistroId(profesional.getUsuarioRegistroId().getId());
         }
@@ -54,6 +56,7 @@ public class ProfesionalMapper {
         profesional.setFechaNacimiento(request.getFechaNacimiento());
         profesional.setTelefono(request.getTelefono());
         profesional.setDireccion(request.getDireccion());
+        profesional.setUsaHorarioNegocio(request.getUsaHorarioNegocio());
         profesional.setRegEstado(2); // Por defecto actualizado
         return profesional;
     }

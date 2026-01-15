@@ -4,7 +4,6 @@ import com.barberia.dto.horarioNegocio.HorarioNegocioRequest;
 import com.barberia.dto.horarioNegocio.HorarioNegocioResponse;
 import com.barberia.models.HorarioNegocio;
 import com.barberia.models.Negocio;
-import com.barberia.models.Profesional;
 import com.barberia.repositories.NegocioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -41,8 +40,8 @@ public class HorarioNegocioMapper {
         return response;
     }
 
-    public HorarioNegocio updateEntity(HorarioNegocio horario, HorarioNegocio request) {
-        Negocio negocio = negocioRepository.findById(request.getNegocio().getId())
+    public HorarioNegocio updateEntity(HorarioNegocio horario, HorarioNegocioRequest request) {
+        Negocio negocio = negocioRepository.findById(request.getNegocio())
                 .orElseThrow(() -> new IllegalArgumentException("Negocio no encontrado con ID: " + request.getNegocio()));
         horario.setNegocio(negocio);
         horario.setDiaSemana(request.getDiaSemana());

@@ -34,6 +34,9 @@ public class Profesional {
     @Column(length = 255, nullable = true)
     private String direccion;
 
+    @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT true")
+    private Boolean usaHorarioNegocio;
+
     @Column(name = "reg_estado", nullable = false, columnDefinition = "INTEGER DEFAULT 1")
     private Integer regEstado;
 

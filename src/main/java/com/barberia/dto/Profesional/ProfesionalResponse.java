@@ -13,6 +13,7 @@ public class ProfesionalResponse {
     public Integer edad;
     public String telefono;
     public String direccion;
+    public Boolean usaHorarioNegocio;
     public int regEstado;
     public Long usuarioRegistroId;
     public Long negocioId;

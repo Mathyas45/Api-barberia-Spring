@@ -2,6 +2,8 @@ package com.barberia.dto.cliente;
 
 import lombok.Data;
 
+import java.time.LocalDateTime;
+
 @Data
 public class ClienteResponse {
     public long id;

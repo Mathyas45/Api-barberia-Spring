@@ -91,6 +91,7 @@ public class HorarioProfesionalService {
         HorarioProfesional actualizadoHorarioProfesional = horarioProfesionalRepository.save(horarioProfesional);
         return horarioProfesionalMapper.toResponse(actualizadoHorarioProfesional);
     }
+
     @Transactional
     public HorarioProfesionalResponse eliminar(Long id) {
         HorarioProfesional horarioProfesional = horarioProfesionalRepository.findById(id)

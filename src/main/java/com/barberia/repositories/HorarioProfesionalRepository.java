@@ -27,17 +27,6 @@ public interface HorarioProfesionalRepository  extends JpaRepository<HorarioProf
             LocalTime fin
     );
 
-
-    @Query("""
-    SELECT h
-    FROM HorarioProfesional h
-    WHERE (:profesionalId IS NULL OR h.profesional.id = :profesionalId)
-      AND (:diaSemana IS NULL OR h.diaSemana = :diaSemana)
-      AND h.regEstado != 0
-    """)
-    List<HorarioProfesional> findByProfesionalAndDiaSemana(Long profesionalId, DiaSemana diaSemana);
-
-
     @Query("""
     SELECT COUNT(h) > 0
     FROM HorarioProfesional h
@@ -54,6 +43,19 @@ public interface HorarioProfesionalRepository  extends JpaRepository<HorarioProf
             LocalTime inicio,
             LocalTime fin
     );
+
+
+    @Query("""
+    SELECT h
+    FROM HorarioProfesional h
+    WHERE (:profesionalId IS NULL OR h.profesional.id = :profesionalId)
+      AND (:diaSemana IS NULL OR h.diaSemana = :diaSemana)
+      AND h.regEstado != 0
+    """)
+    List<HorarioProfesional> findByProfesionalAndDiaSemana(Long profesionalId, DiaSemana diaSemana);
+
+
+
     @Modifying
     @Query("""
         UPDATE HorarioProfesional h
@@ -63,6 +65,5 @@ public interface HorarioProfesionalRepository  extends JpaRepository<HorarioProf
         """)
     void desactivarPorProfesionalYDiaSemana(Long profesionalId, DiaSemana diaSemana);
 
-//    List<HorarioProfesional>findByProfesionaIdAndRegEstadoNot(Long profesionalId, int regEstado);
-//    List<HorarioProfesional> findByRegEstadoNot(int regEstado);
+
 }

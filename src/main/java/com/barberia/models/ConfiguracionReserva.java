@@ -1,6 +1,5 @@
 package com.barberia.models;
 
-import com.barberia.models.enums.DiaSemana;
 import jakarta.persistence.*;
 import lombok.Data;
 import org.hibernate.annotations.CreationTimestamp;
@@ -9,30 +8,41 @@ import org.springframework.data.annotation.LastModifiedBy;
 import org.springframework.data.jpa.domain.support.AuditingEntityListener;
 
 import java.time.LocalDateTime;
-import java.time.LocalTime;
-@Data//esto es para generar los metodos get y set
-@Entity//esto es para indicar que es una entidad de base de datos
-@Table(name = "horarios_negocio")
+
+@Data
+@Entity
+@Table(name = "configuracion_reservas",
+        uniqueConstraints = @UniqueConstraint(columnNames = "negocio_id"))// unique constraint sirve para que no haya dos configuraciones para el mismo negocio
 @EntityListeners({AuditingEntityListener.class})
-public class HorarioNegocio {
+public class ConfiguracionReserva {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @OneToOne
     @JoinColumn(name = "negocio_id", nullable = false)
     private Negocio negocio;
 
-    @Enumerated(EnumType.STRING)
-    @Column(name = "dia_semana", nullable = false, length = 10)
-    private DiaSemana diaSemana;
+    //  No reservar con poca anticipación
+    @Column(nullable = true)
+    private Integer anticipacionHoras;
 
-    @Column(nullable = false)
-    private LocalTime horaInicio;
+    // Hasta cuántos días adelante
+    @Column(nullable = true)
+    private Integer anticipacionMaximaDias;
 
-    @Column(nullable = false)
-    private LocalTime horaFin;
+    //  Permite reservar el mismo día
+    @Column(nullable = true)
+    private Boolean permiteMismoDia;
+
+    //  Intervalo entre turnos
+    @Column(nullable = true)
+    private Integer intervaloTurnosMinutos;
+
+    // Cancelaciones permitidas hasta
+    @Column(nullable = true)
+    private Integer horasMinimasCancelacion;
 
     @Column(nullable = false)
     private Integer regEstado;

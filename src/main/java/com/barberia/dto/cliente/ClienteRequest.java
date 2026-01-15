@@ -22,10 +22,6 @@ public class ClienteRequest {
     @Size(max = 100, message = "El email no puede exceder 100 caracteres")
     public String email;
 
-    // usuarioRegistroId ya NO es necesario - se captura automáticamente con @LastModifiedBy
-    // public Long usuarioRegistroId;
 
-    // negocioId ya NO es necesario - se captura automáticamente con @CreatedBy del JWT
-    // @NotNull(message = "El negocioId es obligatorio")
-    // public Long negocioId;
+
 }
