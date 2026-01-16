@@ -2,11 +2,14 @@ package com.barberia.services;
 
 import com.barberia.dto.ConfiguracionReserva.ConfiguracionReservaRequest;
 import com.barberia.dto.ConfiguracionReserva.ConfiguracionReservaResponse;
+import com.barberia.dto.horarioNegocio.HorarioNegocioResponse;
 import com.barberia.mappers.ConfiguracionReservaMapper;
 import com.barberia.models.ConfiguracionReserva;
 import com.barberia.repositories.ConfiguracionReservaRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
 
 @Service
 public class ConfiguracionReservaService {
@@ -22,7 +25,44 @@ public class ConfiguracionReservaService {
     public ConfiguracionReservaResponse create(ConfiguracionReservaRequest request) {
         ConfiguracionReserva configuracionReserva = configuracionReservaMapper.toEntity(request);
 
+        if (configuracionReservaRepository.existsByNegocioId(request.getNegocioId())) {
+            throw new RuntimeException("El negocio ya tiene una configuración de reservas.");
+        }
+
+        if (Boolean.FALSE.equals(configuracionReserva.getPermiteMismoDia())
+                && configuracionReserva.getAnticipacionHoras() == null) {
+            throw new RuntimeException("Si no se permite reservas el mismo día, debe especificar las horas de anticipación.");
+        }
+
         ConfiguracionReserva nuevaConfiguracionReserva = configuracionReservaRepository.save(configuracionReserva);
         return configuracionReservaMapper.toResponse(nuevaConfiguracionReserva);
     }
+
+    @Transactional(readOnly = true)
+    public ConfiguracionReservaResponse findById(Long id) {
+        ConfiguracionReserva configuracionReserva = configuracionReservaRepository.findById(id).orElseThrow(() -> new RuntimeException("Configuración de Reserva no encontrada con ID: " + id));
+        return configuracionReservaMapper.toResponse(configuracionReserva);
+    }
+
+    @Transactional
+    public ConfiguracionReservaResponse update(Long id, ConfiguracionReservaRequest request) {
+
+        ConfiguracionReserva configuracionReservaExistente = configuracionReservaRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Configuración de Reserva no encontrada con ID: " + id));
+
+
+        ConfiguracionReserva actualizada =
+                configuracionReservaMapper.updateEntity(configuracionReservaExistente, request);
+
+        if (Boolean.FALSE.equals(actualizada.getPermiteMismoDia())
+                && actualizada.getAnticipacionHoras() == null) {
+            throw new RuntimeException(
+                    "Si no se permite reservas el mismo día, debe especificar las horas de anticipación."
+            );
+        }
+
+        ConfiguracionReserva guardada = configuracionReservaRepository.save(actualizada);
+        return configuracionReservaMapper.toResponse(guardada);
+    }
+
 }

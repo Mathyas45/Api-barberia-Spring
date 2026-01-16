@@ -33,8 +33,8 @@ public class ConfiguracionReserva {
     private Integer anticipacionMaximaDias;
 
     //  Permite reservar el mismo día
-    @Column(nullable = true)
-    private Boolean permiteMismoDia;
+    @Column(nullable = false)
+    private Boolean permiteMismoDia = true;
 
     //  Intervalo entre turnos
     @Column(nullable = true)

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.time.LocalTime;
 import java.util.List;
+import java.util.Optional;
 
 public interface HorarioNegocioRepository extends JpaRepository<HorarioNegocio, Long> {
 
@@ -63,4 +64,11 @@ public interface HorarioNegocioRepository extends JpaRepository<HorarioNegocio, 
           AND h.diaSemana = :diaSemana
         """)
     void desactivarPorNegocioYDiaSemana(Long negocio, DiaSemana diaSemana);
+
+    @Query("""
+    SELECT h
+    FROM HorarioNegocio h
+    WHERE h.negocio.id = :negocioId and h.regEstado != 0 and h.diaSemana = :diaSemana
+    """)
+    List<HorarioNegocio> findByNegocioIdAndDiaSemana(Long negocioId,  DiaSemana diaSemana);
 }

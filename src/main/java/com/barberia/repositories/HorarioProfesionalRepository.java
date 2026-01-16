@@ -1,7 +1,6 @@
 package com.barberia.repositories;
 
 import com.barberia.models.HorarioProfesional;
-import com.barberia.models.Profesional;
 import com.barberia.models.enums.DiaSemana;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
@@ -65,5 +64,11 @@ public interface HorarioProfesionalRepository  extends JpaRepository<HorarioProf
         """)
     void desactivarPorProfesionalYDiaSemana(Long profesionalId, DiaSemana diaSemana);
 
+    @Query("""
+    SELECT h
+    FROM HorarioProfesional h
+    WHERE h.profesional.id = :id and h.regEstado != 0 and h.diaSemana = :diaSemana
+    """)
+    List<HorarioProfesional> findByProfesionalIdAndDiaSemana(Long id, DiaSemana diaSemana);
 
 }

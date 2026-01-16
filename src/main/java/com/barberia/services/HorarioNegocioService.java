@@ -57,15 +57,18 @@ public class HorarioNegocioService {
 
     @Transactional
     public HorarioNegocioResponse update(Long id, HorarioNegocioRequest request) {
+
         HorarioNegocio horarioNegocioExistente = horarioNegocioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Horario Negocio no encontrado con ID: " + id));
 
+        HorarioNegocio horarioNegocioActualizado =
+                horarioNegocioMapper.updateEntity(horarioNegocioExistente, request);
+
         if (horarioNegocioRepository.existeSolapamientoExcluyendoId(id,
-                request.getNegocio(), request.getDiaSemana(), request.getHoraInicio(), request.getHoraFin())) {
+                horarioNegocioActualizado.getNegocio().getId(), horarioNegocioActualizado.getDiaSemana(), horarioNegocioActualizado.getHoraInicio(), horarioNegocioActualizado.getHoraFin())) {
             throw new RuntimeException("El horario se cruza con un horario existente para el mismo profesional en el mismo día.");
         }
 
-        HorarioNegocio horarioNegocioActualizado = horarioNegocioMapper.updateEntity(horarioNegocioExistente, request);
         HorarioNegocio guardadoHorarioNegocio = horarioNegocioRepository.save(horarioNegocioActualizado);
         return horarioNegocioMapper.toResponse(guardadoHorarioNegocio);
     }

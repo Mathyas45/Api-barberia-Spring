@@ -16,7 +16,8 @@ public class ConfiguracionReservaRequest{
      @Positive(message = "La anticipacionMaximaDias debe ser un número positivo")
      public Integer anticipacionMaximaDias;
 
-     public Boolean permiteMismoDia;
+     @NotNull(message = "El campo permiteMismoDia no puede ser nulo")
+     private Boolean permiteMismoDia = true;
 
      @Positive(message = "El tiempoMinimoCancelacionHoras debe ser un número positivo")
      public Integer tiempoMinimoCancelacionHoras;

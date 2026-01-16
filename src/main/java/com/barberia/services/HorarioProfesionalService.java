@@ -65,20 +65,21 @@ public class HorarioProfesionalService {
         HorarioProfesional horarioProfesionalExistente = horarioProfesionalRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Horario Profesional no encontrado con ID: " + id));
 
-        if (!request.getHoraInicio().isBefore(request.getHoraFin())) {
+        HorarioProfesional horarioActualizado = horarioProfesionalMapper.updateEntity(horarioProfesionalExistente, request);
+
+        if (!horarioActualizado.getHoraInicio().isBefore(horarioActualizado.getHoraFin())) {
             throw new RuntimeException("La hora de inicio debe ser menor a la hora fin");
         }
 
         if (horarioProfesionalRepository.existeSolapamientoExcluyendoId(id,
-                request.getProfesional_id(), request.getDiaSemana(), request.getHoraInicio(), request.getHoraFin())) {
+                horarioActualizado.getProfesional().getId(), horarioActualizado.getDiaSemana(), horarioActualizado.getHoraInicio(), horarioActualizado.getHoraFin())) {
             throw new RuntimeException("El horario se cruza con un horario existente para el mismo profesional en el mismo día.");
         }
 
-        if (Duration.between(request.getHoraInicio(), request.getHoraFin()).toMinutes() < 15) {
+        if (Duration.between(horarioActualizado.getHoraInicio(), horarioActualizado.getHoraFin()).toMinutes() < 15) {
             throw new RuntimeException("El horario debe ser de al menos 15 minutos");
         }
 
-        HorarioProfesional horarioActualizado = horarioProfesionalMapper.updateEntity(horarioProfesionalExistente, request);
         HorarioProfesional guardadoHorarioProfesional = horarioProfesionalRepository.save(horarioActualizado);
         return horarioProfesionalMapper.toResponse(guardadoHorarioProfesional);
     }

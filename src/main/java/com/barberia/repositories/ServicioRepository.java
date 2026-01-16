@@ -6,6 +6,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Repository
 public interface ServicioRepository extends JpaRepository<Servicio, Long> {
@@ -19,4 +20,6 @@ public interface ServicioRepository extends JpaRepository<Servicio, Long> {
 
     @Query("SELECT COUNT(c) > 0 FROM Servicio c WHERE c.nombre = :nombre AND c.regEstado != 0")
     boolean existsByNombreAndRegEstadoNotEliminado(String nombre);
+
+    Optional<Servicio> findById(Long id);
 }
