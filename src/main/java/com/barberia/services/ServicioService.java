@@ -12,6 +12,7 @@ import com.barberia.repositories.ServicioRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -37,7 +38,7 @@ public class ServicioService {
             throw new RuntimeException("El nombre del servicio ya está registrado.");
         }
 
-        if(servicio.getPrecio() < 0){
+        if (servicio.getPrecio().compareTo(BigDecimal.ZERO) < 0) {
             throw new RuntimeException("El precio no puede ser negativo.");
         }
 

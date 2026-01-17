@@ -36,7 +36,7 @@ public class Servicio {
     private Integer duracionMinutosAprox;
 
     @Column(nullable = false)
-    private Double precio;
+    private BigDecimal precio;
 
     @Column(nullable = false, name = "reg_estado")
     private Integer regEstado;
