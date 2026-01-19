@@ -14,7 +14,7 @@ spring:
   # IMPORTANTE: En producción usa variables de entorno
   # ${DB_HOST:localhost} = Lee de variable de entorno DB_HOST, si no existe usa "localhost"
   datasource:
-    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:barberia_db}?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=UTC&allowPublicKeyRetrieval=true
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:barberia_db}?createDatabaseIfNotExist=true&useSSL=false&serverTimezone=America/Lima&allowPublicKeyRetrieval=true
     username: ${DB_USERNAME:root}
     password: ${DB_PASSWORD:12345678}
     driver-class-name: com.mysql.cj.jdbc.Driver

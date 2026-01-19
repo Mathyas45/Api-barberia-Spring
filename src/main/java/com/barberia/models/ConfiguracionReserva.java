@@ -40,6 +40,12 @@ public class ConfiguracionReserva {
     @Column(nullable = true)
     private Integer intervaloTurnosMinutos;
 
+    @Column(nullable = true)
+    private Integer anticipacionMinimaHoras;
+
+    @Column(nullable = false)
+    private Boolean permiteCancelacion = true;
+
     // Cancelaciones permitidas hasta
     @Column(nullable = true)
     private Integer horasMinimasCancelacion;

@@ -4,6 +4,8 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 @Data
 public class ServicioUpdateRequest {
 
@@ -16,10 +18,8 @@ public class ServicioUpdateRequest {
 
     private Integer duracionMinutos;
 
-    private Double precio;
+    private BigDecimal precio;
 
     private Long categoria;
 
-    // usuarioRegistroId ya NO es necesario - se captura automáticamente con @LastModifiedBy
-    // private Long usuarioRegistroId;
 }

@@ -11,6 +11,8 @@ public class ConfiguracionReservaResponse
         public Long negocioId;
         public Integer anticipacionHoras;
         public Integer anticipacionMaximaDias;
+        public Integer anticipacionMinimaHoras;
+        public Boolean permiteCancelacion;
         public Boolean permiteMismoDia;
         public Integer tiempoMinimoCancelacionHoras;
         public Integer intervaloTurnosMinutos;

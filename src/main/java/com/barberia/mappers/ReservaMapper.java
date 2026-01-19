@@ -33,6 +33,7 @@ public class ReservaMapper {
         response.setId(reserva.getId());
         response.setFecha(reserva.getFecha());
         response.setHoraInicio(reserva.getHoraInicio());
+        response.setHoraFin(reserva.getHoraFin());
         response.setTipo(reserva.getTipo());
         response.setEstado(reserva.getEstado());
         response.setRegEstado(reserva.getRegEstado());
@@ -47,6 +48,14 @@ public class ReservaMapper {
             response.setClienteId(reserva.getCliente().getId());
         }
         return response;
+    }
+
+    public Reserva updateEntity(Reserva reserva, ReservaRequest request) {
+        reserva.setFecha(request.getFecha());
+        reserva.setHoraInicio(request.getHoraInicio());
+        reserva.setTipo(request.getTipo());
+        reserva.setRegEstado(2); // Por defecto actualizado
+        return reserva;
     }
 
 }

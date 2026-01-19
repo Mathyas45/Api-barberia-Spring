@@ -21,6 +21,8 @@ public class ConfiguracionReservaMapper {
         config.setNegocio(negocio);
         config.setAnticipacionHoras(request.getAnticipacionHoras());
         config.setAnticipacionMaximaDias(request.getAnticipacionMaximaDias());
+        config.setAnticipacionMinimaHoras(request.getAnticipacionMinimaHoras());
+        config.setPermiteCancelacion(request.getPermiteCancelacion());
         config.setPermiteMismoDia(request.getPermiteMismoDia());
         config.setIntervaloTurnosMinutos(request.getIntervaloTurnosMinutos());
         config.setHorasMinimasCancelacion(request.getHorasMinimasCancelacion());
@@ -36,6 +38,8 @@ public class ConfiguracionReservaMapper {
         }
         response.setAnticipacionHoras(config.getAnticipacionHoras());
         response.setAnticipacionMaximaDias(config.getAnticipacionMaximaDias());
+        response.setAnticipacionMinimaHoras(config.getAnticipacionMinimaHoras());
+        response.setPermiteCancelacion(config.getPermiteCancelacion());
         response.setPermiteMismoDia(config.getPermiteMismoDia());
         response.setIntervaloTurnosMinutos(config.getIntervaloTurnosMinutos());
         response.setHorasMinimasCancelacion(config.getHorasMinimasCancelacion());
@@ -51,6 +55,8 @@ public class ConfiguracionReservaMapper {
         config.setNegocio(negocio);
         config.setAnticipacionHoras(request.getAnticipacionHoras());
         config.setAnticipacionMaximaDias(request.getAnticipacionMaximaDias());
+        config.setAnticipacionMinimaHoras(request.getAnticipacionMinimaHoras());
+        config.setPermiteCancelacion(request.getPermiteCancelacion());
         config.setPermiteMismoDia(request.getPermiteMismoDia());
         config.setIntervaloTurnosMinutos(request.getIntervaloTurnosMinutos());
         config.setHorasMinimasCancelacion(request.getHorasMinimasCancelacion());

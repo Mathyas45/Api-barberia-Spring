@@ -9,7 +9,7 @@ public class ServicioResponse {
     public String nombre;
     public String descripcion;
     public Integer duracionMinutos;
-    public Double precio;
+    public BigDecimal precio;
     public Long categoria;
     public Long usuarioRegistroId;
     public Long negocioId;

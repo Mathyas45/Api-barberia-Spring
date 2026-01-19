@@ -12,7 +12,6 @@ import java.time.LocalTime;
 public class ReservaResponse {
 
     private Long id;
-
     private LocalDate fecha;
     private LocalTime horaInicio;
     private LocalTime horaFin;

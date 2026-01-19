@@ -5,6 +5,8 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import java.math.BigDecimal;
+
 
 @Data
 public class ServicioRequest {
@@ -17,14 +19,9 @@ public class ServicioRequest {
 
     public Integer duracionMinutos;
 
-    public Double precio;
+    public BigDecimal precio;
 
     public Long categoria;
 
-    // usuarioRegistroId ya NO es necesario - se captura automáticamente con @LastModifiedBy
-    // public Long usuarioRegistroId;
 
-    // negocioId ya NO es necesario - se captura automáticamente con @CreatedBy del JWT
-    // @NotNull(message = "El campo negocioId es obligatorio")
-    // public Long negocioId;
 }

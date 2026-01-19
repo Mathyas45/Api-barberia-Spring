@@ -70,10 +70,7 @@ public class ServicioMapper {
         servicio.setDuracionMinutosAprox(request.getDuracionMinutos());
         servicio.setRegEstado(2); // Por defecto actualizado
         
-        // usuarioRegistroId ya NO es necesario - se actualiza automáticamente con @LastModifiedBy
-        // Usuario usuarioRegistro = usuarioRepository.findById(request.getUsuarioRegistroId())...
-        // servicio.setUsuarioRegistroId(usuarioRegistro);
-        
+
         return servicio;
     }
 

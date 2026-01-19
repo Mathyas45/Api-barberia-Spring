@@ -3,6 +3,7 @@ package com.barberia.dto.reserva;
 import com.barberia.models.enums.EstadoReserva;
 import com.barberia.models.enums.TipoReserva;
 import lombok.Data;
+import jakarta.validation.constraints.NotNull;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -17,6 +18,7 @@ public class ReservaRequest {
     private Long clienteId;      // null si es walk-in
 
     private LocalDate fecha;
+    @NotNull(message = "La hora de inicio no puede ser nula")
     private LocalTime horaInicio;
 
     private List<Long> serviciosIds;
