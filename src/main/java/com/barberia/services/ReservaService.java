@@ -1,5 +1,6 @@
 package com.barberia.services;
 
+import com.barberia.dto.EstadoRequestGlobal;
 import com.barberia.dto.reserva.ReservaRequest;
 import com.barberia.dto.reserva.ReservaResponse;
 import com.barberia.mappers.ReservaMapper;
@@ -21,6 +22,9 @@ import java.util.List;
 public class ReservaService {
 
 
+    LocalDate fechaActual = LocalDate.now();
+    LocalDateTime fechaYHoraActual = LocalDateTime.now();
+
     @Autowired
     private ProfesionalRepository profesionalRepository;
     @Autowired
@@ -29,7 +33,6 @@ public class ReservaService {
     private ClienteRepository clienteRepository;
     @Autowired
     private ServicioRepository servicioRepository;
-
 
     private final ReservaRepository reservaRepository;
     private final ConfiguracionReservaRepository configuracionReservaRepository;
@@ -66,8 +69,6 @@ public class ReservaService {
         Integer anticipacionHoras = configReserva.getAnticipacionHoras();
         Integer anticipacionMinimaHoras = configReserva.getAnticipacionMinimaHoras();
         LocalDate fechaReserva = request.getFecha();
-        LocalDate fechaActual = LocalDate.now();
-        LocalDateTime fechaYHoraActual = LocalDateTime.now();
 
         if (fechaReserva == null || request.getHoraInicio() == null) {
             throw new RuntimeException("Fecha y hora son obligatorias");
@@ -231,17 +232,18 @@ public class ReservaService {
     }
 
     @Transactional(readOnly = true)
-    public List<ReservaResponse> findAll(Long profesionalId, LocalDate fecha, Long clienteId) {
-        List<Reserva> reservas = reservaRepository.findByFilters(profesionalId, fecha, clienteId);
+    public List<ReservaResponse> findAll(Long profesionalId, Long clienteId, LocalDate fechaDesde, LocalDate fechaHasta, String estado) {
+
+        List<Reserva> reservas = reservaRepository.findByFilters(profesionalId, clienteId,fechaDesde, fechaHasta, estado);
         return reservas.stream()
                 .map(reservaMapper::toResponse)
                 .toList();
     }
+
     @Transactional
-    public ReservaResponse cambiarEstado(Long id, EstadoReserva nuevoEstado) {
+    public ReservaResponse cancelarReserva(Long id) {
         Reserva reserva = reservaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Reserva no encontrada con ID: " + id));
-        reserva.setEstado(nuevoEstado);
         reserva.setEstado(EstadoReserva.CANCELADA);
         Reserva reservaActualizada = reservaRepository.save(reserva);
         return reservaMapper.toResponse(reservaActualizada);
@@ -251,6 +253,7 @@ public class ReservaService {
         Reserva reserva = reservaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Reserva no encontrada con ID: " + id));
         reserva.setRegEstado(0);
+        reserva.setEstado(EstadoReserva.CANCELADA);
         Reserva reservaActualizada = reservaRepository.save(reserva);
         return reservaMapper.toResponse(reservaActualizada);
     }
@@ -261,7 +264,33 @@ public class ReservaService {
         Reserva reserva = reservaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Reserva no existe"));
 
-        reservaMapper.updateEntity(reserva, request);
+        Negocio negocio = negocioRepository.findById(request.getNegocioId())
+                .orElseThrow(() -> new RuntimeException("Negocio no existe"));
+        reserva.setNegocio(negocio);
+
+        Profesional profesional = profesionalRepository.findById(request.getProfesionalId())
+                .orElseThrow(() -> new RuntimeException("Profesional no existe"));
+        reserva.setProfesional(profesional);
+
+        Cliente cliente = clienteRepository.findById(request.getClienteId())
+                .orElseThrow(() -> new RuntimeException("Cliente no existe"));
+        reserva.setCliente(cliente);
+
+        ConfiguracionReserva configReserva = configuracionReservaRepository
+                .findByNegocioId(request.getNegocioId())
+                .orElseThrow(() -> new RuntimeException("Configuración de reserva no encontrada para el negocio"));
+
+        Reserva reservaActualizada = reservaMapper.updateEntity(reserva, request);
+
+        if (reservaActualizada.getFecha().isBefore(fechaActual)) {
+            throw new RuntimeException("No se puede reservar en fechas pasadas");
+        }
+
+        if (reservaActualizada.getFecha().isEqual(fechaActual)) {
+            if (request.getHoraInicio().isBefore(LocalTime.now())) {
+                throw new RuntimeException("No se puede reservar en una hora pasada");
+            }
+        }
 
         if (reserva.getEstado() == EstadoReserva.CANCELADA) {
             throw new RuntimeException("No se puede modificar una reserva cancelada");
@@ -286,9 +315,9 @@ public class ReservaService {
             precioTotal = precioTotal.add(servicio.getPrecio());
         }
 
-        reserva.setFecha(request.getFecha());
-        reserva.setHoraInicio(request.getHoraInicio());
-        reserva.setHoraFin(request.getHoraInicio().plusMinutes(duracionTotal));
+        reserva.setFecha(reservaActualizada.getFecha());
+        reserva.setHoraInicio(reservaActualizada.getHoraInicio());
+        reserva.setHoraFin(reservaActualizada.getHoraInicio().plusMinutes(duracionTotal));
         reserva.setDuracionTotalMinutos(duracionTotal);
         reserva.setPrecioTotal(precioTotal);
 

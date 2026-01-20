@@ -4,6 +4,9 @@ import com.barberia.models.enums.EstadoReserva;
 import com.barberia.models.enums.TipoReserva;
 import lombok.Data;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.NotEmpty;
+import jakarta.validation.constraints.Future;
+import jakarta.validation.constraints.FutureOrPresent;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
@@ -13,14 +16,22 @@ import java.util.List;
 @Data
 public class ReservaRequest {
 
+    @NotNull(message = "El negocio es obligatorio")
     private Long negocioId;
-    private Long profesionalId; // puede ser null si es automático
-    private Long clienteId;      // null si es walk-in
+    
+    @NotNull(message = "El profesional es obligatorio")
+    private Long profesionalId;
+    
+    private Long clienteId; // puede ser null para walk-in
 
+    @NotNull(message = "La fecha es obligatoria")
+    @FutureOrPresent(message = "La fecha no puede ser pasada")
     private LocalDate fecha;
-    @NotNull(message = "La hora de inicio no puede ser nula")
+    
+    @NotNull(message = "La hora de inicio es obligatoria")
     private LocalTime horaInicio;
 
+    @NotEmpty(message = "Debe seleccionar al menos un servicio")
     private List<Long> serviciosIds;
 
     private TipoReserva tipo; // CLIENTE / ADMIN / WALK_IN

@@ -10,9 +10,9 @@ import java.util.List;
 public class DisponibilidadResponse {
 
     private LocalDate fecha;
-
     private Long profesionalId;
     private String profesionalNombre;
-
     private List<LocalTime> horasDisponibles;
+    private Integer duracionServicioMinutos;
+    private Integer cantidadHorasDisponibles;
 }

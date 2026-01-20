@@ -29,24 +29,58 @@ public class ReservaMapper {
     }
 
     public ReservaResponse toResponse(Reserva reserva) {
-        ReservaResponse response = new ReservaResponse();//esto sirve para crear una nueva instancia de la clase ReservaResponse, la instancia es un objeto que representa la respuesta de la reserva en el sistema
+        ReservaResponse response = new ReservaResponse();
+        
+        // Datos básicos
         response.setId(reserva.getId());
         response.setFecha(reserva.getFecha());
         response.setHoraInicio(reserva.getHoraInicio());
         response.setHoraFin(reserva.getHoraFin());
+        response.setDuracionTotalMinutos(reserva.getDuracionTotalMinutos());
+        response.setPrecioTotal(reserva.getPrecioTotal());
         response.setTipo(reserva.getTipo());
         response.setEstado(reserva.getEstado());
-        response.setRegEstado(reserva.getRegEstado());
-        response.setCreatedAt(reserva.getCreatedAt());
+        
+        // Negocio
         if (reserva.getNegocio() != null) {
             response.setNegocioId(reserva.getNegocio().getId());
+            response.setNegocioNombre(reserva.getNegocio().getNombre());
         }
+        
+        // Profesional
         if (reserva.getProfesional() != null) {
             response.setProfesionalId(reserva.getProfesional().getId());
         }
+        
+        // Cliente
         if (reserva.getCliente() != null) {
             response.setClienteId(reserva.getCliente().getId());
         }
+        
+        // Servicios
+        if (reserva.getServicios() != null && !reserva.getServicios().isEmpty()) {
+            response.setServicios(
+                reserva.getServicios().stream()
+                    .map(rs -> {
+                        ReservaResponse.ServicioReservaDTO dto = new ReservaResponse.ServicioReservaDTO();
+                        dto.setServicioId(rs.getServicio().getId());
+                        dto.setServicioNombre(rs.getServicio().getNombre());
+                        dto.setDuracionMinutos(rs.getDuracionMinutos());
+                        dto.setPrecio(rs.getPrecio());
+                        return dto;
+                    })
+                    .toList()
+            );
+        }
+        
+        // Auditoría
+        response.setCreatedAt(reserva.getCreatedAt());
+        response.setUpdatedAt(reserva.getUpdatedAt());
+        response.setRegEstado(reserva.getRegEstado());
+        if (reserva.getUsuarioRegistroId() != null) {
+            response.setUsuarioRegistroId(reserva.getUsuarioRegistroId().getId());
+        }
+        
         return response;
     }
 

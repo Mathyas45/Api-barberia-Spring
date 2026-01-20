@@ -54,22 +54,31 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     );
 
 
-    List<Reserva> findByProfesionalIdOrfechaContainingIgnoreCase(Long profesionalId, LocalDate fecha);
-    List<Reserva> findByRegEstadoNot(int regEstado);
-
     @Query("""
-        SELECT r
-        FROM Reserva r
-        WHERE (:profesionalId IS NULL OR r.profesional.id = :profesionalId)
-          AND (:fecha IS NULL OR r.fecha = :fecha)
-          AND (:clienteId IS NULL OR r.cliente.id = :clienteId)
-          AND r.regEstado <> 0
-    """)
+    SELECT r
+    FROM Reserva r
+    WHERE (:profesionalId IS NULL OR r.profesional.id = :profesionalId)
+      AND (:fechaDesde IS NULL OR :fechaHasta IS NULL OR r.fecha BETWEEN :fechaDesde AND :fechaHasta)
+      AND (:clienteId IS NULL OR r.cliente.id = :clienteId)
+      AND (:estado IS NULL OR r.estado = :estado)
+      AND r.regEstado <> 0
+""")
     List<Reserva> findByFilters(
-        @Param("profesionalId") Long profesionalId,
-        @Param("fecha") LocalDate fecha,
-        @Param("clienteId") Long clienteId
+            @Param("profesionalId") Long profesionalId,
+            @Param("clienteId") Long clienteId,
+            @Param("fechaDesde") LocalDate fechaDesde,
+            @Param("fechaHasta") LocalDate fechaHasta,
+            @Param("estado") String estado
     );
 
+    // Buscar reservas por estado de registro (útil para activas/eliminadas)
+    List<Reserva> findByRegEstadoNot(Integer regEstado);
 
+    // Buscar reservas de un cliente específico
+    List<Reserva> findByClienteIdAndRegEstadoNot(Long clienteId, Integer regEstado);
+
+    // Buscar reservas de un profesional en una fecha
+    List<Reserva> findByProfesionalIdAndFechaAndRegEstadoNot(Long profesionalId, LocalDate fecha, Integer regEstado);
+
+    List<Reserva> findByProfesionalIdAndFecha(Long profesionalId, LocalDate fecha);
 }
