@@ -5,6 +5,7 @@ import com.barberia.dto.disponibilidad.DisponibilidadResponse;
 import com.barberia.models.*;
 import com.barberia.models.enums.DiaSemana;
 import com.barberia.repositories.*;
+import com.barberia.services.common.SecurityContextService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,19 +22,23 @@ public class DisponibilidadService {
     private final ConfiguracionReservaRepository configRepo;
     private final ProfesionalRepository profesionalRepository;
     private final ReservaRepository reservaRepository;
+    private final SecurityContextService securityContextService;
 
     public DisponibilidadService(HorarioProfesionalRepository horarioProfesionalRepo,
                                  HorarioNegocioRepository horarioNegocioRepo,
                                  ServicioRepository servicioRepo,
                                  ConfiguracionReservaRepository configRepo,
                                  ProfesionalRepository profesionalRepository,
-                                 ReservaRepository reservaRepository) {
+                                 ReservaRepository reservaRepository,
+                                 SecurityContextService securityContextService) {
         this.reservaRepository = reservaRepository;
         this.horarioProfesionalRepo = horarioProfesionalRepo;
         this.horarioNegocioRepo = horarioNegocioRepo;
         this.servicioRepo = servicioRepo;
         this.configRepo = configRepo;
-        this.profesionalRepository = profesionalRepository;}
+        this.profesionalRepository = profesionalRepository;
+        this.securityContextService = securityContextService;
+    }
 
 
     /**
@@ -49,13 +54,16 @@ public class DisponibilidadService {
      */
     @Transactional
     public DisponibilidadResponse disponibilidad(DisponibilidadRequest request) {
+        // MULTI-TENANT: Obtener negocioId del JWT
+        Long negocioId = securityContextService.getNegocioIdFromContext();
+        
         LocalDate fecha = request.getFecha();
 
         // Convertir el día de la semana
         DiaSemana diaSemana = DiaSemana.fromDayOfWeek(fecha.getDayOfWeek());
 
         // Obtener configuración del negocio para el intervalo entre turnos
-        ConfiguracionReserva configReserva = configRepo.findByNegocioId(request.getNegocioId())
+        ConfiguracionReserva configReserva = configRepo.findByNegocioId(negocioId)
                 .orElseThrow(() -> new RuntimeException("Configuración de reserva no existe"));
         int intervaloTurnosMinutos = configReserva.getIntervaloTurnosMinutos(); // Puede ser 0
 
@@ -81,7 +89,7 @@ public class DisponibilidadService {
         if(usaHorarioNegocio){
             // Usar horarios del negocio
             List<HorarioNegocio> horarios = horarioNegocioRepo.findByNegocioIdAndDiaSemana(
-                    request.getNegocioId(),
+                    negocioId,
                     diaSemana
             );
             if(horarios.isEmpty()){

@@ -7,6 +7,7 @@ import com.barberia.mappers.ProfesionalMapper;
 import com.barberia.models.Profesional;
 import com.barberia.repositories.ProfesionalRepository;
 import com.barberia.services.common.FechaService;
+import com.barberia.services.common.SecurityContextService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -19,19 +20,24 @@ public class ProfesionalService {
     private final ProfesionalRepository profesionalRepository;
     private final ProfesionalMapper profesionalMapper;
     private final FechaService fechaService;
+    private final SecurityContextService securityContextService;
 
 
-    public ProfesionalService(ProfesionalRepository profesionalRepository, ProfesionalMapper profesionalMapper, FechaService fechaService) {
+    public ProfesionalService(ProfesionalRepository profesionalRepository, ProfesionalMapper profesionalMapper, FechaService fechaService, SecurityContextService securityContextService) {
         this.profesionalRepository = profesionalRepository;
         this.profesionalMapper = profesionalMapper;
         this.fechaService = fechaService;
+        this.securityContextService = securityContextService;
     }
 
     @Transactional
     public ProfesionalResponse create(ProfesionalRequest request) {
+        Long negocioId = securityContextService.getNegocioIdFromContext();
         Profesional profesional = profesionalMapper.toEntity(request);
-        boolean  nombreProfesionaRepetido = profesionalRepository.existsByNombreAndRegEstadoNotEliminado(profesional.getNombreCompleto());
-        if (nombreProfesionaRepetido) {
+        
+        // MULTI-TENANT: Verificar nombre único dentro del mismo negocio
+        boolean nombreProfesionalRepetido = profesionalRepository.existsByNombreAndRegEstadoNotEliminadoAndNegocioId(profesional.getNombreCompleto(), negocioId);
+        if (nombreProfesionalRepetido) {
             throw new RuntimeException("El nombre del profesional ya está registrado.");
         }
         Profesional nuevoProfesional = profesionalRepository.save(profesional);
@@ -48,15 +54,18 @@ public class ProfesionalService {
         }
         return response;
     }
-    @Transactional(readOnly = true)
-    public List<ProfesionalResponse> findAll(String query) {
-        List<Profesional> profesionales;
+        @Transactional(readOnly = true)
+        public List<ProfesionalResponse> findAll(String query) {
+            // MULTI-TENANT: Obtener negocioId del JWT
+            Long negocioId = securityContextService.getNegocioIdFromContext();
+            
+            List<Profesional> profesionales;
 
-        if (query != null && !query.isEmpty()) {
-            profesionales = profesionalRepository.findByNombreCompletoContainingIgnoreCaseOrDocumentoIdentidadContainingIgnoreCase(query, 0);
-        } else {
-            profesionales = profesionalRepository.findByRegEstadoNot(0);
-        }
+            if (query != null && !query.isEmpty()) {
+                profesionales = profesionalRepository.findByNombreCompletoOrDocumentoIdentidadAndRegEstadoNotAndNegocioId(query, 0, negocioId);
+            } else {
+                profesionales = profesionalRepository.findByRegEstadoNotAndNegocioId(0, negocioId);
+            }
 
         return profesionales.stream()
                 .map(profesional-> {
@@ -64,7 +73,7 @@ public class ProfesionalService {
                         response.setEdad(fechaService.calcularEdad(profesional.getFechaNacimiento()));
                         return response;
                 })
-                .collect(Collectors.toList()); //esto es para convertir la lista de entidades a lista de responses nos sirve para evitar codigo repetitivo
+                .collect(Collectors.toList());
     }
 
     @Transactional

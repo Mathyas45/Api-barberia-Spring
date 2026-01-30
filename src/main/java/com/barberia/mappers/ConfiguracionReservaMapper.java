@@ -5,6 +5,7 @@ import com.barberia.dto.ConfiguracionReserva.ConfiguracionReservaResponse;
 import com.barberia.models.ConfiguracionReserva;
 import com.barberia.models.Negocio;
 import com.barberia.repositories.NegocioRepository;
+import com.barberia.services.common.SecurityContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -13,11 +14,17 @@ import org.springframework.stereotype.Component;
 public class ConfiguracionReservaMapper {
     @Autowired
     private NegocioRepository negocioRepository;
+    
+    @Autowired
+    private SecurityContextService securityContextService;
 
     public ConfiguracionReserva toEntity(ConfiguracionReservaRequest request) {
+        // MULTI-TENANT: Obtener negocioId del JWT
+        Long negocioId = securityContextService.getNegocioIdFromContext();
+        
         ConfiguracionReserva config = new ConfiguracionReserva();//esto sirve para crear una nueva instancia de la clase ConfiguracionReserva, la instancia es un objeto que representa una configuracion de reserva en el sistema
-        Negocio negocio = negocioRepository.findById(request.getNegocioId())
-                .orElseThrow(() -> new IllegalArgumentException("Negocio no encontrado con ID: " + request.getNegocioId()));
+        Negocio negocio = negocioRepository.findById(negocioId)
+                .orElseThrow(() -> new IllegalArgumentException("Negocio no encontrado con ID: " + negocioId));
         config.setNegocio(negocio);
         config.setAnticipacionHoras(request.getAnticipacionHoras());
         config.setAnticipacionMaximaDias(request.getAnticipacionMaximaDias());
@@ -50,9 +57,7 @@ public class ConfiguracionReservaMapper {
     }
 
     public ConfiguracionReserva updateEntity(ConfiguracionReserva config, ConfiguracionReservaRequest request) {
-        Negocio negocio = negocioRepository.findById(request.getNegocioId())
-                .orElseThrow(() -> new IllegalArgumentException("Negocio no encontrado con ID: " + request.getNegocioId()));
-        config.setNegocio(negocio);
+        // En update no cambiamos el negocio, solo los otros campos
         config.setAnticipacionHoras(request.getAnticipacionHoras());
         config.setAnticipacionMaximaDias(request.getAnticipacionMaximaDias());
         config.setAnticipacionMinimaHoras(request.getAnticipacionMinimaHoras());

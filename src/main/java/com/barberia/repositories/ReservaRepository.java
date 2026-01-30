@@ -57,13 +57,15 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     @Query("""
     SELECT r
     FROM Reserva r
-    WHERE (:profesionalId IS NULL OR r.profesional.id = :profesionalId)
+    WHERE r.negocio.id = :negocioId
+      AND (:profesionalId IS NULL OR r.profesional.id = :profesionalId)
       AND (:fechaDesde IS NULL OR :fechaHasta IS NULL OR r.fecha BETWEEN :fechaDesde AND :fechaHasta)
       AND (:clienteId IS NULL OR r.cliente.id = :clienteId)
       AND (:estado IS NULL OR r.estado = :estado)
       AND r.regEstado <> 0
 """)
     List<Reserva> findByFilters(
+            @Param("negocioId") Long negocioId,
             @Param("profesionalId") Long profesionalId,
             @Param("clienteId") Long clienteId,
             @Param("fechaDesde") LocalDate fechaDesde,

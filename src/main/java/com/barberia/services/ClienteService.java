@@ -1,15 +1,18 @@
 package com.barberia.services;
 
 import com.barberia.dto.EstadoRequestGlobal;
+import com.barberia.dto.cliente.ClienteImportResponse;
 import com.barberia.dto.cliente.ClienteRequest;
 import com.barberia.dto.cliente.ClienteRequestCliente;
 import com.barberia.dto.cliente.ClienteResponse;
 import com.barberia.mappers.ClienteMapper;
 import com.barberia.models.Cliente;
 import com.barberia.repositories.ClienteRepository;
+import com.barberia.services.common.SecurityContextService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -17,18 +20,20 @@ import java.util.stream.Collectors;
 public class ClienteService {
 
     private final ClienteRepository clienteRepository;
-    private final ClienteMapper clienteMapper ;
+    private final ClienteMapper clienteMapper;
+    private final SecurityContextService securityContextService;
 
     //Inyección por constructor (mejor práctica)
-    public ClienteService(ClienteRepository clienteRepository , ClienteMapper clienteMapper) {
+    public ClienteService(ClienteRepository clienteRepository, ClienteMapper clienteMapper, SecurityContextService securityContextService) {
         this.clienteRepository = clienteRepository;
         this.clienteMapper = clienteMapper;
+        this.securityContextService = securityContextService;
     }
 
     @Transactional
     public ClienteResponse createClienteProtegido (ClienteRequest request) {
         Cliente cliente = clienteMapper.toEntity(request);
-        if(cliente.getTelefono().length()   != 9 ){
+        if(cliente.getTelefono().length() != 9 ){
             throw new RuntimeException("El teléfono debe tener 9 dígitos.");
         }
         // Verificar si el cliente ya existe por telefono
@@ -62,21 +67,26 @@ public class ClienteService {
 
     @Transactional(readOnly = true)
     public List<ClienteResponse> findAll(String query) {
+        // MULTI-TENANT: Obtener negocioId del JWT (no del frontend)
+        Long negocioId = securityContextService.getNegocioIdFromContext();
+        
         List<Cliente> clientes;
-
-        String nombreCompleto = query;
-        String documentoIdentidad = query;
-        String telefono = query;
-
-        if (nombreCompleto != null && !documentoIdentidad.isBlank() && !telefono.isBlank()) {
-            clientes = clienteRepository.findByNombreCompletoContainingIgnoreCaseOrDocumentoIdentidadOrTelefonoContainingIgnoreCase(nombreCompleto, documentoIdentidad, telefono);
+    
+        if (query != null && !query.isBlank()) {
+            clientes = clienteRepository.findByNombreCompletoContainingIgnoreCaseOrDocumentoIdentidadOrTelefonoContainingIgnoreCaseAndRegEstadoNotAndNegocioId(
+                    query,
+                    query,
+                    query,
+                    0,
+                    negocioId
+            );
         } else {
-            clientes = clienteRepository.findAll();
+            clientes = clienteRepository.findAllByNegocioIdAndRegEstadoNot(negocioId, 0);
         }
 
-        return clientes.stream()//stream es para trabajar con colecciones de datos nos permite aplicar operaciones funcionales como map, filter, reduce, etc.
+        return clientes.stream()
                 .map(clienteMapper::toResponse)
-                .collect(Collectors.toList()); //esto es para convertir la lista de entidades a lista de responses nos sirve para evitar codigo repetitivo
+                .collect(Collectors.toList());
     }
 
     @Transactional
@@ -105,5 +115,72 @@ public class ClienteService {
         cliente.setRegEstado(0);
         Cliente nuevoCliente = clienteRepository.save(cliente);
         return clienteMapper.toResponse(nuevoCliente);
+    }
+
+    /**
+     * Importación masiva de clientes desde Excel
+     * 
+     * Recorre la lista de clientes y los inserta uno por uno.
+     * Si un cliente falla (ej: teléfono duplicado), se registra el error
+     * pero continúa con los demás.
+     * 
+     * @param clientes Lista de clientes a importar
+     * @return Resumen de la importación con éxitos y errores
+     */
+    @Transactional
+    public ClienteImportResponse importarClientes(List<ClienteRequest> clientes) {
+        List<ClienteResponse> insertados = new ArrayList<>();
+        List<ClienteImportResponse.ErrorImportacion> errores = new ArrayList<>();
+        
+        int fila = 1; // Para indicar qué fila del Excel falló
+        
+        for (ClienteRequest request : clientes) {
+            fila++;
+            try {
+                // Validar teléfono
+                if (request.getTelefono() == null || request.getTelefono().length() != 9) {
+                    errores.add(ClienteImportResponse.ErrorImportacion.builder()
+                            .fila(fila)
+                            .nombreCompleto(request.getNombreCompleto())
+                            .telefono(request.getTelefono())
+                            .mensaje("El teléfono debe tener 9 dígitos")
+                            .build());
+                    continue;
+                }
+                
+                // Verificar si ya existe
+                List<Cliente> existentes = clienteRepository.findClientesByTelefono(request.getTelefono());
+                if (!existentes.isEmpty()) {
+                    errores.add(ClienteImportResponse.ErrorImportacion.builder()
+                            .fila(fila)
+                            .nombreCompleto(request.getNombreCompleto())
+                            .telefono(request.getTelefono())
+                            .mensaje("El teléfono ya está registrado")
+                            .build());
+                    continue;
+                }
+                
+                // Crear el cliente
+                Cliente cliente = clienteMapper.toEntity(request);
+                Cliente nuevoCliente = clienteRepository.save(cliente);
+                insertados.add(clienteMapper.toResponse(nuevoCliente));
+                
+            } catch (Exception e) {
+                errores.add(ClienteImportResponse.ErrorImportacion.builder()
+                        .fila(fila)
+                        .nombreCompleto(request.getNombreCompleto())
+                        .telefono(request.getTelefono())
+                        .mensaje("Error: " + e.getMessage())
+                        .build());
+            }
+        }
+        
+        return ClienteImportResponse.builder()
+                .totalRecibidos(clientes.size())
+                .totalInsertados(insertados.size())
+                .totalErrores(errores.size())
+                .clientesInsertados(insertados)
+                .errores(errores)
+                .build();
     }
 }

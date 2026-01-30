@@ -3,6 +3,8 @@ package com.barberia.controllers;
 import com.barberia.dto.ApiResponse;
 import com.barberia.dto.EstadoRequestGlobal;
 import com.barberia.dto.Profesional.ProfesionalResponse;
+import com.barberia.dto.cliente.ClienteImportRequest;
+import com.barberia.dto.cliente.ClienteImportResponse;
 import com.barberia.dto.cliente.ClienteRequest;
 import com.barberia.dto.cliente.ClienteRequestCliente;
 import com.barberia.dto.cliente.ClienteResponse;
@@ -100,6 +102,50 @@ public class ClienteController {
 
 
     /**
+     * Importar clientes desde Excel (importación masiva)
+     * 
+     * Recibe una lista de clientes y los inserta uno por uno.
+     * Retorna un resumen con los éxitos y errores.
+     * 
+     * SEGURIDAD:
+     * - ADMIN: Puede importar siempre
+     * - Otros roles: Necesitan el permiso CREATE_CLIENTS
+     * 
+     * Uso desde Angular:
+     * 1. Leer el Excel con xlsx o similar
+     * 2. Convertir filas a array de objetos
+     * 3. POST a /api/clientes/import con { clientes: [...] }
+     */
+    @PostMapping("/import")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('CREATE_CLIENTS')")
+    public ResponseEntity<ApiResponse<ClienteImportResponse>> importarClientes(
+            @Valid @RequestBody ClienteImportRequest request) {
+        try {
+            ClienteImportResponse resultado = clienteService.importarClientes(request.getClientes());
+            
+            String mensaje = String.format("Importación completada: %d insertados, %d errores",
+                    resultado.getTotalInsertados(), resultado.getTotalErrores());
+            
+            return ResponseEntity.ok(
+                    ApiResponse.<ClienteImportResponse>builder()
+                            .code(200)
+                            .success(true)
+                            .message(mensaje)
+                            .data(resultado)
+                            .build()
+            );
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(
+                    ApiResponse.<ClienteImportResponse>builder()
+                            .code(400)
+                            .success(false)
+                            .message("Error en la importación: " + e.getMessage())
+                            .build()
+            );
+        }
+    }
+
+    /**
      * Obtener cliente por ID
      * 
      * SEGURIDAD:
@@ -132,6 +178,10 @@ public class ClienteController {
      * SEGURIDAD:
      * - ADMIN: Puede listar siempre
      * - Otros roles: Necesitan el permiso READ_CLIENTS
+     * 
+     * MULTI-TENANT:
+     * - El negocioId se obtiene automáticamente del JWT
+     * - No es necesario enviarlo desde el frontend (más seguro)
      */
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('READ_CLIENTS')")

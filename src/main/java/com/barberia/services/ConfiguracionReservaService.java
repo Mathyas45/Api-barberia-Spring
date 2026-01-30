@@ -6,6 +6,7 @@ import com.barberia.dto.horarioNegocio.HorarioNegocioResponse;
 import com.barberia.mappers.ConfiguracionReservaMapper;
 import com.barberia.models.ConfiguracionReserva;
 import com.barberia.repositories.ConfiguracionReservaRepository;
+import com.barberia.services.common.SecurityContextService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,17 +16,22 @@ import java.util.List;
 public class ConfiguracionReservaService {
     private final ConfiguracionReservaRepository configuracionReservaRepository;
     private final ConfiguracionReservaMapper configuracionReservaMapper;
+    private final SecurityContextService securityContextService;
 
-    public ConfiguracionReservaService(ConfiguracionReservaRepository configuracionReservaRepository, ConfiguracionReservaMapper configuracionReservaMapper) {
+    public ConfiguracionReservaService(ConfiguracionReservaRepository configuracionReservaRepository, ConfiguracionReservaMapper configuracionReservaMapper, SecurityContextService securityContextService) {
         this.configuracionReservaRepository = configuracionReservaRepository;
         this.configuracionReservaMapper = configuracionReservaMapper;
+        this.securityContextService = securityContextService;
     }
 
     @Transactional
     public ConfiguracionReservaResponse create(ConfiguracionReservaRequest request) {
+        // MULTI-TENANT: Obtener negocioId del JWT
+        Long negocioId = securityContextService.getNegocioIdFromContext();
+        
         ConfiguracionReserva configuracionReserva = configuracionReservaMapper.toEntity(request);
 
-        if (configuracionReservaRepository.existsByNegocioId(request.getNegocioId())) {
+        if (configuracionReservaRepository.existsByNegocioId(negocioId)) {
             throw new RuntimeException("El negocio ya tiene una configuración de reservas.");
         }
 

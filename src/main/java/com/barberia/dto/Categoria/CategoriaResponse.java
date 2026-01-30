@@ -13,5 +13,6 @@ public class CategoriaResponse {
     public LocalDateTime createdAt;
     public LocalDateTime updatedAt;
     public Long negocioId;
+    public boolean estado;
     public int regEstado;
 }

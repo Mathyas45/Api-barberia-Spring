@@ -8,6 +8,7 @@ import com.barberia.mappers.HorarioNegocioMapper;
 import com.barberia.models.HorarioNegocio;
 import com.barberia.models.enums.DiaSemana;
 import com.barberia.repositories.HorarioNegocioRepository;
+import com.barberia.services.common.SecurityContextService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,13 +18,18 @@ import java.util.List;
 public class HorarioNegocioService {
     private final HorarioNegocioRepository horarioNegocioRepository;
     private final HorarioNegocioMapper horarioNegocioMapper;
+    private final SecurityContextService securityContextService;
 
-    public HorarioNegocioService(HorarioNegocioRepository horarioNegocioRepository, HorarioNegocioMapper horarioNegocioMapper) {
+    public HorarioNegocioService(HorarioNegocioRepository horarioNegocioRepository, HorarioNegocioMapper horarioNegocioMapper, SecurityContextService securityContextService) {
         this.horarioNegocioRepository = horarioNegocioRepository;
         this.horarioNegocioMapper = horarioNegocioMapper;
+        this.securityContextService = securityContextService;
     }
     @Transactional
     public HorarioNegocioResponse create(HorarioNegocioRequest request) {
+        // MULTI-TENANT: Obtener negocioId del JWT
+        Long negocioId = securityContextService.getNegocioIdFromContext();
+        
         HorarioNegocio horarioNegocio = horarioNegocioMapper.toEntity(request);
 
         if (!horarioNegocio.getHoraInicio().isBefore(request.getHoraFin())) {
@@ -31,7 +37,7 @@ public class HorarioNegocioService {
         }
 
         if (horarioNegocioRepository.existeSolapamiento(
-                request.getNegocio(), request.getDiaSemana(), request.getHoraInicio(), request.getHoraFin())) {
+                negocioId, request.getDiaSemana(), request.getHoraInicio(), request.getHoraFin())) {
             throw new RuntimeException("El horario se cruza con un horario existente en el mismo día.");
         }
 
@@ -47,7 +53,10 @@ public class HorarioNegocioService {
     }
 
     @Transactional(readOnly = true)
-    public List<HorarioNegocioResponse> findAll(Long negocioId,  DiaSemana diaSemana) {
+    public List<HorarioNegocioResponse> findAll(DiaSemana diaSemana) {
+        // MULTI-TENANT: Obtener negocioId del JWT
+        Long negocioId = securityContextService.getNegocioIdFromContext();
+        
         List<HorarioNegocio> horariosNegocio = horarioNegocioRepository.findByNegocioAndDiaSemana(negocioId, diaSemana);
 
         return horariosNegocio.stream()
@@ -94,11 +103,14 @@ public class HorarioNegocioService {
 
     @Transactional
     public void copiarHorarios(CopiarHorarioNegocioRequest request) {
-        List<HorarioNegocio> horariosOrigen = horarioNegocioRepository.findByNegocioAndDiaSemana(request.getNegocio(), request.getOrigen());
+        // MULTI-TENANT: Obtener negocioId del JWT
+        Long negocioId = securityContextService.getNegocioIdFromContext();
+        
+        List<HorarioNegocio> horariosOrigen = horarioNegocioRepository.findByNegocioAndDiaSemana(negocioId, request.getOrigen());
 
             for (DiaSemana DiaDestino : request.getDestinos()) {
 
-                horarioNegocioRepository.desactivarPorNegocioYDiaSemana(request.getNegocio(), DiaDestino);
+                horarioNegocioRepository.desactivarPorNegocioYDiaSemana(negocioId, DiaDestino);
 
                 for (HorarioNegocio h : horariosOrigen) {
 

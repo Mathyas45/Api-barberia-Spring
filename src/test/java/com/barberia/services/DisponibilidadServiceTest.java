@@ -5,6 +5,7 @@ import com.barberia.dto.disponibilidad.DisponibilidadResponse;
 import com.barberia.models.*;
 import com.barberia.models.enums.DiaSemana;
 import com.barberia.repositories.*;
+import com.barberia.services.common.SecurityContextService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
@@ -53,6 +54,9 @@ class DisponibilidadServiceTest {
     
     @Mock
     private ReservaRepository reservaRepository;
+    
+    @Mock
+    private SecurityContextService securityContextService;
 
     // Servicio a probar con los mocks inyectados
     @InjectMocks
@@ -94,6 +98,9 @@ class DisponibilidadServiceTest {
         profesional.setId(1L);
         profesional.setNombreCompleto("Juan Pérez");
         profesional.setUsaHorarioNegocio(true);
+        
+        // MULTI-TENANT: Mock del SecurityContextService para retornar negocioId
+        when(securityContextService.getNegocioIdFromContext()).thenReturn(1L);
     }
 
     /**

@@ -17,6 +17,7 @@ public class CategoriaMapper {
         Categoria categoria = new Categoria(); // esto sirve para crear una nueva instancia de la clase Categoria, la instancia es un objeto que representa una categoria en el sistema
         categoria.setNombre(request.getNombre());
         categoria.setDescripcion(request.getDescripcion());
+        categoria.setEstado(request.getEstado());
         categoria.setRegEstado(1); // Por defecto activo
         return categoria;
     }
@@ -34,6 +35,7 @@ public class CategoriaMapper {
         if (categoria.getNegocio() != null) {
             response.setNegocioId(categoria.getNegocio().getId());
         }
+        response.setEstado(categoria.isEstado());
         response.setRegEstado(categoria.getRegEstado());
         return response;
     }
@@ -41,6 +43,7 @@ public class CategoriaMapper {
     public  Categoria updateEntity(Categoria categoria, CategoriaRequest request) {
         categoria.setNombre(request.getNombre());
         categoria.setDescripcion(request.getDescripcion());
+        categoria.setEstado(request.getEstado());
         return categoria;
     }
 }

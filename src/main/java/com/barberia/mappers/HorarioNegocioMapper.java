@@ -5,6 +5,7 @@ import com.barberia.dto.horarioNegocio.HorarioNegocioResponse;
 import com.barberia.models.HorarioNegocio;
 import com.barberia.models.Negocio;
 import com.barberia.repositories.NegocioRepository;
+import com.barberia.services.common.SecurityContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
@@ -12,11 +13,17 @@ import org.springframework.stereotype.Component;
 public class HorarioNegocioMapper {
     @Autowired
     private NegocioRepository negocioRepository;
+    
+    @Autowired
+    private SecurityContextService securityContextService;
 
     public HorarioNegocio toEntity(HorarioNegocioRequest request) {
+        // MULTI-TENANT: Obtener negocioId del JWT
+        Long negocioId = securityContextService.getNegocioIdFromContext();
+        
         HorarioNegocio horario = new HorarioNegocio(); // esto sirve para crear una nueva instancia de la clase HorarioNegocio, la instancia es un objeto que representa un horario de negocio en el sistema
-        Negocio negocio = negocioRepository.findById(request.getNegocio())
-                .orElseThrow(() -> new IllegalArgumentException("Negocio no encontrado con ID: " + request.getNegocio()));
+        Negocio negocio = negocioRepository.findById(negocioId)
+                .orElseThrow(() -> new IllegalArgumentException("Negocio no encontrado con ID: " + negocioId));
         horario.setNegocio(negocio);
         horario.setDiaSemana(request.getDiaSemana());
         horario.setHoraInicio(request.getHoraInicio());
@@ -41,9 +48,7 @@ public class HorarioNegocioMapper {
     }
 
     public HorarioNegocio updateEntity(HorarioNegocio horario, HorarioNegocioRequest request) {
-        Negocio negocio = negocioRepository.findById(request.getNegocio())
-                .orElseThrow(() -> new IllegalArgumentException("Negocio no encontrado con ID: " + request.getNegocio()));
-        horario.setNegocio(negocio);
+        // En update no cambiamos el negocio, solo los otros campos
         horario.setDiaSemana(request.getDiaSemana());
         horario.setHoraInicio(request.getHoraInicio());
         horario.setHoraFin(request.getHoraFin());

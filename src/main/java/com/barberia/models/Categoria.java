@@ -26,6 +26,9 @@ public class Categoria {
     @Column(length = 255)
     private String descripcion;
 
+    @Column(name = "estado", nullable = false, columnDefinition = "BOOLEAN DEFAULT true")
+    private boolean estado;
+
     @Column(name = "reg_estado", nullable = false, columnDefinition = "INTEGER DEFAULT 1")
     private Integer regEstado;
 

@@ -45,7 +45,7 @@ class ClienteServiceTest {
     private Cliente clienteMock;
 
     @BeforeEach
-    void setUp() {
+    void setUp() { //esto sirve para inicializar datos comunes antes de cada test
         clienteMock = new Cliente();
         clienteMock.setId(1L);
         clienteMock.setNombreCompleto("Juan Pérez");
@@ -69,7 +69,7 @@ class ClienteServiceTest {
         // ACT
         List<Cliente> resultado = clienteRepository.findAll();
 
-        // ASSERT
+        // ASSERT , esto sirve para validar los resultados esperados
         assertNotNull(resultado);
         assertEquals(2, resultado.size());
         assertEquals("Juan Pérez", resultado.get(0).getNombreCompleto());
@@ -187,11 +187,11 @@ class ClienteServiceTest {
     @DisplayName("Debe buscar clientes por nombre")
     void debeBuscarClientesPorNombre() {
         // ARRANGE
-        when(clienteRepository.findByNombreCompletoContainingIgnoreCaseOrDocumentoIdentidadOrTelefonoContainingIgnoreCase("juan", "juan", "juan"))
+        when(clienteRepository.findByNombreCompletoContainingIgnoreCaseOrDocumentoIdentidadOrTelefonoContainingIgnoreCaseAndRegEstadoNotAndNegocioId("juan", "juan", "juan", 0, 1L))
                 .thenReturn(List.of(clienteMock));
 
         // ACT
-        List<Cliente> resultado = clienteRepository.findByNombreCompletoContainingIgnoreCaseOrDocumentoIdentidadOrTelefonoContainingIgnoreCase("juan", "juan", "juan");
+        List<Cliente> resultado = clienteRepository.findByNombreCompletoContainingIgnoreCaseOrDocumentoIdentidadOrTelefonoContainingIgnoreCaseAndRegEstadoNotAndNegocioId("juan", "juan", "juan", 0, 1L);
 
         // ASSERT
         assertNotNull(resultado);
@@ -199,7 +199,7 @@ class ClienteServiceTest {
         assertEquals("Juan Pérez", resultado.get(0).getNombreCompleto());
         
         verify(clienteRepository, times(1))
-                .findByNombreCompletoContainingIgnoreCaseOrDocumentoIdentidadOrTelefonoContainingIgnoreCase("juan", "juan", "juan");
+                .findByNombreCompletoContainingIgnoreCaseOrDocumentoIdentidadOrTelefonoContainingIgnoreCaseAndRegEstadoNotAndNegocioId("juan", "juan", "juan", 0, 1L);
     }
 
     @Test

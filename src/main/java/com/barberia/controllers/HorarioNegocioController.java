@@ -76,10 +76,9 @@ public class HorarioNegocioController {
     @GetMapping // Cambiar la ruta para evitar conflicto
     @PreAuthorize("hasRole('ADMIN') or  hasAuthority('READ_BUSINESS_SCHEDULES')")
     public ResponseEntity<ApiResponse<List<HorarioNegocioResponse>>> findAll(
-            @RequestParam(required = false) Long negocioId,
             @RequestParam(required = false) DiaSemana diaSemana) {
         try {
-            List<HorarioNegocioResponse> horariosNegocio = horarioNegocioService.findAll(negocioId, diaSemana);
+            List<HorarioNegocioResponse> horariosNegocio = horarioNegocioService.findAll(diaSemana);
             return ResponseEntity.ok(
                     ApiResponse.<List<HorarioNegocioResponse>>builder()
                             .code(200)

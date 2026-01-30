@@ -15,4 +15,6 @@ public class CategoriaRequest {
     @Size(max = 500, message = "La descripción no puede exceder 500 caracteres")
     public String descripcion;
 
+    public Boolean estado;
+
 }

@@ -6,6 +6,7 @@ import com.barberia.dto.EstadoRequestGlobal;
 import com.barberia.mappers.CategoriaMapper;
 import com.barberia.models.Categoria;
 import com.barberia.repositories.CategoriaRepository;
+import com.barberia.services.common.SecurityContextService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -17,19 +18,23 @@ public class CategoriaService {
 
     private final CategoriaRepository categoriaRepository;
     private final CategoriaMapper categoriaMapper;
+    private final SecurityContextService securityContextService;
 
 
-    public CategoriaService(CategoriaRepository categoriaRepository, CategoriaMapper categoriaMapper) {
+    public CategoriaService(CategoriaRepository categoriaRepository, CategoriaMapper categoriaMapper, SecurityContextService securityContextService) {
         this.categoriaRepository = categoriaRepository;
         this.categoriaMapper = categoriaMapper;
+        this.securityContextService = securityContextService;
     }
 
     @Transactional
     public CategoriaResponse create(CategoriaRequest request) {
+       Long negocioId = securityContextService.getNegocioIdFromContext();
        Categoria categoria = categoriaMapper.toEntity(request);
 
-        boolean  nombreProfesionaRepetido = categoriaRepository.existsByNombreAndRegEstadoNotEliminado(categoria.getNombre());
-        if (nombreProfesionaRepetido) {
+        // MULTI-TENANT: Verificar nombre único dentro del mismo negocio
+        boolean nombreCategoriaRepetido = categoriaRepository.existsByNombreAndRegEstadoNotEliminadoAndNegocioId(categoria.getNombre(), negocioId);
+        if (nombreCategoriaRepetido) {
             throw new RuntimeException("El nombre de la categoria ya está registrado.");
         }
 
@@ -45,12 +50,15 @@ public class CategoriaService {
 
     @Transactional(readOnly = true)
     public List<CategoriaResponse> findAll(String query) {
+        // MULTI-TENANT: Obtener negocioId del JWT
+        Long negocioId = securityContextService.getNegocioIdFromContext();
+        
         List<Categoria> categorias;
 
         if (query != null && !query.isEmpty()) {
-            categorias = categoriaRepository.findByNombreAndRegEstado(query, 0);
+            categorias = categoriaRepository.findByNombreAndRegEstadoNotAndNegocioId(query, 0, negocioId);
         } else {
-            categorias = categoriaRepository.findByRegEstadoNot(0);
+            categorias = categoriaRepository.findByRegEstadoNotAndNegocioId(0, negocioId);
         }
 
         return categorias.stream()

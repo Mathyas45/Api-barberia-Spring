@@ -13,8 +13,8 @@ public interface ClienteRepository  extends JpaRepository<Cliente, Long> {
 
     Cliente findClienteByTelefono(String telefono);
 
-    List<Cliente> findByNombreCompletoContainingIgnoreCaseOrDocumentoIdentidadOrTelefonoContainingIgnoreCase(String nombreCompleto, String documentoIdentidad, String telefono); //buscar por nombre o apellido ignorando mayusculas y minusculas
-
+    List<Cliente>findByNombreCompletoContainingIgnoreCaseOrDocumentoIdentidadOrTelefonoContainingIgnoreCaseAndRegEstadoNotAndNegocioId(String nombreCompleto, String documentoIdentidad, String telefono, int regEstado, Long negocioId);
+   List<Cliente>findAllByNegocioIdAndRegEstadoNot(Long negocioId, int regEstado);
     List<Cliente> findClientesByTelefono(String telefono);
 
 

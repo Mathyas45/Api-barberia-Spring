@@ -22,4 +22,13 @@ public interface ServicioRepository extends JpaRepository<Servicio, Long> {
     boolean existsByNombreAndRegEstadoNotEliminado(String nombre);
 
     Optional<Servicio> findById(Long id);
+
+    // ========== MÉTODOS MULTI-TENANT (filtrado por negocioId) ==========
+    
+    List<Servicio> findByNombreContainingIgnoreCaseAndRegEstadoNotAndNegocioId(String nombre, int regEstado, Long negocioId);
+    
+    List<Servicio> findByRegEstadoNotAndNegocioId(int regEstado, Long negocioId);
+    
+    @Query("SELECT COUNT(c) > 0 FROM Servicio c WHERE c.nombre = :nombre AND c.regEstado != 0 AND c.negocio.id = :negocioId")
+    boolean existsByNombreAndRegEstadoNotEliminadoAndNegocioId(String nombre, Long negocioId);
 }

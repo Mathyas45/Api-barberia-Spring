@@ -8,6 +8,7 @@ import com.barberia.models.*;
 import com.barberia.models.enums.DiaSemana;
 import com.barberia.models.enums.EstadoReserva;
 import com.barberia.repositories.*;
+import com.barberia.services.common.SecurityContextService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,18 +38,22 @@ public class ReservaService {
     private final ReservaRepository reservaRepository;
     private final ConfiguracionReservaRepository configuracionReservaRepository;
     private final ReservaMapper reservaMapper;
+    private final SecurityContextService securityContextService;
 
 
-    public ReservaService(ReservaRepository reservaRepository, ReservaMapper reservaMapper , ConfiguracionReservaRepository configuracionReservaRepository) {
+    public ReservaService(ReservaRepository reservaRepository, ReservaMapper reservaMapper, ConfiguracionReservaRepository configuracionReservaRepository, SecurityContextService securityContextService) {
         this.reservaRepository = reservaRepository;
         this.reservaMapper = reservaMapper;
         this.configuracionReservaRepository = configuracionReservaRepository;
+        this.securityContextService = securityContextService;
     }
     @Transactional
     public ReservaResponse create(ReservaRequest request) {
+        // MULTI-TENANT: Obtener negocioId del JWT
+        Long negocioId = securityContextService.getNegocioIdFromContext();
 
         Reserva reserva = reservaMapper.toEntity(request);
-        Negocio negocio = negocioRepository.findById(request.getNegocioId())
+        Negocio negocio = negocioRepository.findById(negocioId)
                 .orElseThrow(() -> new RuntimeException("Negocio no existe"));
         reserva.setNegocio(negocio);
 
@@ -61,7 +66,7 @@ public class ReservaService {
         reserva.setCliente(cliente);
 
         ConfiguracionReserva configReserva = configuracionReservaRepository
-                .findByNegocioId(request.getNegocioId())
+                .findByNegocioId(negocioId)
                 .orElseThrow(() -> new RuntimeException("Configuración de reserva no encontrada para el negocio"));
 
         Boolean permiteMismodia = configReserva.getPermiteMismoDia();
@@ -154,10 +159,12 @@ public class ReservaService {
 
     @Transactional
     public ReservaResponse createAdmin(ReservaRequest request) {
+        // MULTI-TENANT: Obtener negocioId del JWT
+        Long negocioId = securityContextService.getNegocioIdFromContext();
 
         Reserva reserva = reservaMapper.toEntity(request);
 
-        Negocio negocio = negocioRepository.findById(request.getNegocioId())
+        Negocio negocio = negocioRepository.findById(negocioId)
                 .orElseThrow(() -> new RuntimeException("Negocio no existe"));
         reserva.setNegocio(negocio);
 
@@ -170,7 +177,7 @@ public class ReservaService {
         reserva.setCliente(cliente);
 
         ConfiguracionReserva configReserva = configuracionReservaRepository
-                .findByNegocioId(request.getNegocioId())
+                .findByNegocioId(negocioId)
                 .orElseThrow(() -> new RuntimeException("Configuración de reserva no encontrada para el negocio"));
 
 
@@ -233,8 +240,10 @@ public class ReservaService {
 
     @Transactional(readOnly = true)
     public List<ReservaResponse> findAll(Long profesionalId, Long clienteId, LocalDate fechaDesde, LocalDate fechaHasta, String estado) {
-
-        List<Reserva> reservas = reservaRepository.findByFilters(profesionalId, clienteId,fechaDesde, fechaHasta, estado);
+        // MULTI-TENANT: Obtener negocioId del JWT
+        Long negocioId = securityContextService.getNegocioIdFromContext();
+        
+        List<Reserva> reservas = reservaRepository.findByFilters(negocioId, profesionalId, clienteId, fechaDesde, fechaHasta, estado);
         return reservas.stream()
                 .map(reservaMapper::toResponse)
                 .toList();
@@ -260,11 +269,13 @@ public class ReservaService {
 
     @Transactional
     public ReservaResponse update(Long id, ReservaRequest request) {
+        // MULTI-TENANT: Obtener negocioId del JWT
+        Long negocioId = securityContextService.getNegocioIdFromContext();
 
         Reserva reserva = reservaRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Reserva no existe"));
 
-        Negocio negocio = negocioRepository.findById(request.getNegocioId())
+        Negocio negocio = negocioRepository.findById(negocioId)
                 .orElseThrow(() -> new RuntimeException("Negocio no existe"));
         reserva.setNegocio(negocio);
 
@@ -277,7 +288,7 @@ public class ReservaService {
         reserva.setCliente(cliente);
 
         ConfiguracionReserva configReserva = configuracionReservaRepository
-                .findByNegocioId(request.getNegocioId())
+                .findByNegocioId(negocioId)
                 .orElseThrow(() -> new RuntimeException("Configuración de reserva no encontrada para el negocio"));
 
         Reserva reservaActualizada = reservaMapper.updateEntity(reserva, request);

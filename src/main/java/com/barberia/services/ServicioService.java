@@ -9,6 +9,7 @@ import com.barberia.mappers.ServicioMapper;
 import com.barberia.models.Profesional;
 import com.barberia.models.Servicio;
 import com.barberia.repositories.ServicioRepository;
+import com.barberia.services.common.SecurityContextService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,17 +24,21 @@ public class ServicioService {
 
     private final ServicioRepository servicioRepository;
     private final ServicioMapper servicioMapper;
+    private final SecurityContextService securityContextService;
 
-    public ServicioService(ServicioRepository servicioRepository, ServicioMapper servicioMapper) {
+    public ServicioService(ServicioRepository servicioRepository, ServicioMapper servicioMapper, SecurityContextService securityContextService) {
         this.servicioRepository = servicioRepository;
         this.servicioMapper = servicioMapper;
+        this.securityContextService = securityContextService;
     }
 
     @Transactional
     public ServicioResponse create(ServicioRequest request) {
+        Long negocioId = securityContextService.getNegocioIdFromContext();
         Servicio servicio = servicioMapper.toEntity(request);
 
-        boolean  nombreServicioRepetido = servicioRepository.existsByNombreAndRegEstadoNotEliminado(servicio.getNombre());
+        // MULTI-TENANT: Verificar nombre único dentro del mismo negocio
+        boolean nombreServicioRepetido = servicioRepository.existsByNombreAndRegEstadoNotEliminadoAndNegocioId(servicio.getNombre(), negocioId);
         if (nombreServicioRepetido) {
             throw new RuntimeException("El nombre del servicio ya está registrado.");
         }
@@ -42,7 +47,7 @@ public class ServicioService {
             throw new RuntimeException("El precio no puede ser negativo.");
         }
 
-        Servicio nuevoServicio =  servicioRepository.save(servicio);
+        Servicio nuevoServicio = servicioRepository.save(servicio);
         return servicioMapper.toResponse(nuevoServicio);
     }
 
@@ -52,16 +57,19 @@ public class ServicioService {
             return servicioMapper.toResponse(servicio);
     }
     @Transactional(readOnly = true)
-    public  List<ServicioResponse> findAll(String query) {
+    public List<ServicioResponse> findAll(String query) {
+        // MULTI-TENANT: Obtener negocioId del JWT
+        Long negocioId = securityContextService.getNegocioIdFromContext();
+        
         List<Servicio> servicios;
         if (query != null && !query.isEmpty()) {
-            servicios = servicioRepository.findByNombreContainingIgnoreCaseAndRegEstadoNot(query, 0);
+            servicios = servicioRepository.findByNombreContainingIgnoreCaseAndRegEstadoNotAndNegocioId(query, 0, negocioId);
         } else {
-            servicios = servicioRepository.findByRegEstadoNot(0);
+            servicios = servicioRepository.findByRegEstadoNotAndNegocioId(0, negocioId);
         }
         return servicios.stream()
                 .map(servicioMapper::toResponse)
-                .collect(Collectors.toList()); //esto es para convertir la lista de entidades a lista de responses nos sirve para evitar codigo repetitivo
+                .collect(Collectors.toList());
     }
     @Transactional
     public ServicioResponse update(Long id, ServicioUpdateRequest request) {
