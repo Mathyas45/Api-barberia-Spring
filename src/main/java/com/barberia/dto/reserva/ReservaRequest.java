@@ -16,9 +16,6 @@ import java.util.List;
 @Data
 public class ReservaRequest {
 
-    @NotNull(message = "El negocio es obligatorio")
-    private Long negocioId;
-    
     @NotNull(message = "El profesional es obligatorio")
     private Long profesionalId;
     

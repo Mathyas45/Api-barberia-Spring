@@ -232,11 +232,11 @@ public class ClienteController {
     }
 
 
-    @PutMapping("/estado/{id}")
+    @PutMapping("/eliminar/{id}")
     @PreAuthorize("hasRole('ADMIN')")
-    public ResponseEntity<ApiResponse<ClienteResponse>> cambiarEstado(@PathVariable Long id, @Valid @RequestBody EstadoRequestGlobal request) {
+    public ResponseEntity<ApiResponse<ClienteResponse>> cambiarEstado(@PathVariable Long id) {
         try {
-            ClienteResponse clienteResponse = clienteService.cambiarEstado(id, request);
+            ClienteResponse clienteResponse = clienteService.eliminar(id);
             return ResponseEntity.ok(
                     ApiResponse.<ClienteResponse>builder()
                             .code(200)

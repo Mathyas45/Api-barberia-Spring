@@ -1,6 +1,7 @@
 package com.barberia.controllers;
 
 import com.barberia.dto.ApiResponse;
+import com.barberia.dto.EstadoRegistroRequest;
 import com.barberia.dto.EstadoRequestGlobal;
 import com.barberia.dto.servicio.ServicioRequest;
 import com.barberia.dto.servicio.ServicioResponse;
@@ -73,10 +74,11 @@ public class ServicioController {
 
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('READ_SERVICIOS')")
-    public ResponseEntity<ApiResponse<List<ServicioResponse>>> findAll(@RequestParam(required = false) String query) {
+    public ResponseEntity<ApiResponse<List<ServicioResponse>>> findAll(
+            @RequestParam(required = false) String query,
+            @RequestParam(required = false) Long categoriaId) {
         try {
-            // Implementar el método findAll en el servicio si es necesario
-            List<ServicioResponse> servicioResponses = servicioService.findAll(query);
+            List<ServicioResponse> servicioResponses = servicioService.findAll(query, categoriaId);
             return ResponseEntity.ok(ApiResponse.<List<ServicioResponse>>builder()
                     .code(201)
                     .success(true)
@@ -111,9 +113,9 @@ public class ServicioController {
 
         }
     }
-    @PutMapping("/estado/{id}")
+    @PatchMapping("/estado/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('UPDATE_SERVICIOS')")
-    public ResponseEntity<ApiResponse<ServicioResponse>> cambiarEstado(@PathVariable Long id, @Valid @RequestBody EstadoRequestGlobal request) {
+    public ResponseEntity<ApiResponse<ServicioResponse>> cambiarEstado(@PathVariable Long id, @Valid @RequestBody EstadoRegistroRequest request) {
         try {
             ServicioResponse response = servicioService.cambiarEstado(id, request);
             return ResponseEntity.ok(ApiResponse.<ServicioResponse>builder()

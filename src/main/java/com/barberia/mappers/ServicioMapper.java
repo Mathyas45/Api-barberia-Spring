@@ -19,11 +19,9 @@ import org.springframework.stereotype.Component;
 public class ServicioMapper {
 
     @Autowired
-    private NegocioRepository negocioRepository;
-    @Autowired
-    private UsuarioRepository usuarioRepository;
-    @Autowired
     private CategoriaRepository categoriaRepository;
+    @Autowired
+    private CategoriaMapper categoriaMapper;
 
     public Servicio toEntity(ServicioRequest request) {
         Servicio servicio = new Servicio();
@@ -32,7 +30,7 @@ public class ServicioMapper {
         Categoria categoria = categoriaRepository.findById(request.getCategoria())
                 .orElseThrow(() -> new IllegalArgumentException("Categoria no encontrado con ID: " + request.getCategoria()));
         servicio.setCategoria(categoria);
-
+        servicio.setEstado(request.getEstado());
         servicio.setPrecio(request.getPrecio());
         servicio.setDuracionMinutosAprox(request.getDuracionMinutos());
         servicio.setRegEstado(1); // Por defecto activo
@@ -43,11 +41,10 @@ public class ServicioMapper {
     public ServicioResponse toResponse(Servicio servicio) {
         ServicioResponse response = new ServicioResponse(); // esto sirve para crear una nueva instancia de la clase ServicioResponse, la instancia es un objeto que representa la respuesta del servicio en el sistema
         response.setId(servicio.getId());
+        response.setEstado(servicio.isEstado());
         response.setNombre(servicio.getNombre());
         response.setDescripcion(servicio.getDescripcion());
-        if(servicio.getCategoria() != null) {
-            response.setCategoria(servicio.getCategoria().getId());
-        }
+        response.setCategoria(categoriaMapper.toResponse(servicio.getCategoria()));
         response.setPrecio(servicio.getPrecio());
         response.setRegEstado(servicio.getRegEstado());
         response.setDuracionMinutos(servicio.getDuracionMinutosAprox());
@@ -68,6 +65,7 @@ public class ServicioMapper {
         servicio.setCategoria(categoria);
         servicio.setPrecio(request.getPrecio());
         servicio.setDuracionMinutosAprox(request.getDuracionMinutos());
+        servicio.setEstado(request.getEstado());
         servicio.setRegEstado(2); // Por defecto actualizado
         
 

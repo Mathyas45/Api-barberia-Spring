@@ -22,4 +22,6 @@ public class ServicioUpdateRequest {
 
     private Long categoria;
 
+    private Boolean estado;
+
 }

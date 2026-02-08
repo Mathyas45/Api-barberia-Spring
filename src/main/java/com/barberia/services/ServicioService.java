@@ -1,5 +1,6 @@
 package com.barberia.services;
 
+import com.barberia.dto.EstadoRegistroRequest;
 import com.barberia.dto.EstadoRequestGlobal;
 import com.barberia.dto.Profesional.ProfesionalResponse;
 import com.barberia.dto.servicio.ServicioRequest;
@@ -57,20 +58,33 @@ public class ServicioService {
             return servicioMapper.toResponse(servicio);
     }
     @Transactional(readOnly = true)
-    public List<ServicioResponse> findAll(String query) {
-        // MULTI-TENANT: Obtener negocioId del JWT
+    public List<ServicioResponse> findAll(String query, Long categoriaId) {
         Long negocioId = securityContextService.getNegocioIdFromContext();
-        
+
         List<Servicio> servicios;
-        if (query != null && !query.isEmpty()) {
-            servicios = servicioRepository.findByNombreContainingIgnoreCaseAndRegEstadoNotAndNegocioId(query, 0, negocioId);
+        if ((query != null && !query.isEmpty()) && categoriaId != null) {
+            // Filtrar por nombre, categoría y estado de la categoría
+            servicios = servicioRepository.findByNombreAndCategoriaIdAndCategoriaEstadoNotAndRegEstadoNotAndNegocioId(
+                    query, categoriaId, 0, negocioId);
+        } else if (query != null && !query.isEmpty()) {
+            // Filtrar por nombre y estado de la categoría
+            servicios = servicioRepository.findByNombreAndCategoriaEstadoNotAndRegEstadoNotAndNegocioId(
+                    query, 0, negocioId);
+        } else if (categoriaId != null) {
+            // Filtrar solo por categoría y estado de la categoría
+            servicios = servicioRepository.findByRegEstadoNotAndNegocioIdAndCategoriaIdAndCategoriaEstadoNot(
+                    0, negocioId, categoriaId);
         } else {
-            servicios = servicioRepository.findByRegEstadoNotAndNegocioId(0, negocioId);
+            // Sin filtros, pero siempre considerando el estado de la categoría
+            servicios = servicioRepository.findByRegEstadoNotAndNegocioIdAndCategoriaEstadoNot(
+                    0, negocioId);
         }
+
         return servicios.stream()
                 .map(servicioMapper::toResponse)
                 .collect(Collectors.toList());
     }
+
     @Transactional
     public ServicioResponse update(Long id, ServicioUpdateRequest request) {
         Servicio servicio = servicioRepository.findById(id)
@@ -80,10 +94,10 @@ public class ServicioService {
         return servicioMapper.toResponse(nuevoServicio);
     }
     @Transactional
-    public ServicioResponse cambiarEstado(Long id, EstadoRequestGlobal request) {
+    public ServicioResponse cambiarEstado(Long id, EstadoRegistroRequest request) {
         Servicio servicio = servicioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Servicio no encontrado con ID: " + id));
-        servicio.setRegEstado(request.getRegEstado());
+        servicio.setEstado(request.isEstado());
         Servicio nuevoEstado =  servicioRepository.save(servicio);
         return servicioMapper.toResponse(nuevoEstado);
     }

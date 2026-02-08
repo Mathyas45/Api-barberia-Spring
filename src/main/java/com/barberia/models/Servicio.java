@@ -38,6 +38,9 @@ public class Servicio {
     @Column(nullable = false)
     private BigDecimal precio;
 
+    @Column(name = "estado", nullable = false, columnDefinition = "BOOLEAN DEFAULT true")
+    private boolean estado;
+
     @Column(nullable = false, name = "reg_estado")
     private Integer regEstado;
 

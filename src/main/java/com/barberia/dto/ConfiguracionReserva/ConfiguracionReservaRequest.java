@@ -7,9 +7,6 @@ import lombok.Data;
 @Data
 public class ConfiguracionReservaRequest{
 
-     @NotNull(message = "El negocioId es obligatorio")
-     public Long negocioId;
-
      @Positive(message = "La anticipacionHoras debe ser un número positivo")
      public Integer anticipacionHoras;
 

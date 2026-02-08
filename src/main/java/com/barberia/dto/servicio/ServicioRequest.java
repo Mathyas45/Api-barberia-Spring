@@ -22,6 +22,8 @@ public class ServicioRequest {
     public BigDecimal precio;
 
     public Long categoria;
+    public Boolean estado;
+
 
 
 }

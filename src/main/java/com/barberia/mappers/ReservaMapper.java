@@ -12,10 +12,6 @@ import org.springframework.stereotype.Component;
 @Component// sirve para que spring lo detecte como un bean es decir un componente gestionado por el contenedor de spring
 public class ReservaMapper {
 
-
-
-
-
     public Reserva toEntity(ReservaRequest request) {
         Reserva reserva = new Reserva();
 
@@ -50,11 +46,13 @@ public class ReservaMapper {
         // Profesional
         if (reserva.getProfesional() != null) {
             response.setProfesionalId(reserva.getProfesional().getId());
+            response.setProfesionalNombre(reserva.getProfesional().getNombreCompleto()); // Agregar nombre del profesional
         }
         
         // Cliente
         if (reserva.getCliente() != null) {
             response.setClienteId(reserva.getCliente().getId());
+            response.setClienteNombre(reserva.getCliente().getNombreCompleto());
         }
         
         // Servicios

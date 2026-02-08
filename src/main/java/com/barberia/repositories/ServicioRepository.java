@@ -24,11 +24,45 @@ public interface ServicioRepository extends JpaRepository<Servicio, Long> {
     Optional<Servicio> findById(Long id);
 
     // ========== MÉTODOS MULTI-TENANT (filtrado por negocioId) ==========
-    
-    List<Servicio> findByNombreContainingIgnoreCaseAndRegEstadoNotAndNegocioId(String nombre, int regEstado, Long negocioId);
-    
-    List<Servicio> findByRegEstadoNotAndNegocioId(int regEstado, Long negocioId);
-    
+    //    metodos para buscar en el service
+    @Query("SELECT s FROM Servicio s " +
+            "JOIN s.categoria c " +
+            "WHERE s.nombre LIKE %:nombre% " +
+            "AND s.regEstado != :regEstado " +
+            "AND c.estado != false " +
+            "AND s.negocio.id = :negocioId")
+    List<Servicio> findByNombreAndCategoriaEstadoNotAndRegEstadoNotAndNegocioId(
+            String nombre, int regEstado, Long negocioId);
+
+    @Query("SELECT s FROM Servicio s " +
+            "JOIN s.categoria c " +
+            "WHERE s.nombre LIKE %:nombre% " +
+            "AND c.estado != false " +
+            "AND c.id = :categoriaId " +
+            "AND s.regEstado != :regEstado " +
+            "AND s.negocio.id = :negocioId")
+    List<Servicio> findByNombreAndCategoriaIdAndCategoriaEstadoNotAndRegEstadoNotAndNegocioId(
+            String nombre, Long categoriaId, int regEstado, Long negocioId);
+
+    @Query("SELECT s FROM Servicio s " +
+            "JOIN s.categoria c " +
+            "WHERE s.regEstado != :regEstado " +
+            "AND s.negocio.id = :negocioId " +
+            "AND c.id = :categoriaId " +
+            "AND c.estado != false")
+    List<Servicio> findByRegEstadoNotAndNegocioIdAndCategoriaIdAndCategoriaEstadoNot(
+            int regEstado, Long negocioId, Long categoriaId);
+
+    @Query("SELECT s FROM Servicio s " +
+            "JOIN s.categoria c " +
+            "WHERE s.regEstado != :regEstado " +
+            "AND s.negocio.id = :negocioId " +
+            "AND c.estado != false " +
+            "AND c.regEstado != 0"
+    )
+    List<Servicio> findByRegEstadoNotAndNegocioIdAndCategoriaEstadoNot(
+            int regEstado, Long negocioId);
+
     @Query("SELECT COUNT(c) > 0 FROM Servicio c WHERE c.nombre = :nombre AND c.regEstado != 0 AND c.negocio.id = :negocioId")
     boolean existsByNombreAndRegEstadoNotEliminadoAndNegocioId(String nombre, Long negocioId);
 }
