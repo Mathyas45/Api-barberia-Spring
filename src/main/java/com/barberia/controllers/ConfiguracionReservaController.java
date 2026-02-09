@@ -42,16 +42,16 @@ public class ConfiguracionReservaController {
             );
         }
     }
-    @GetMapping("/{id}")
+    @GetMapping()
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('READ_RESERVATION_CONFIGURATIONS')")
-    public ResponseEntity<ApiResponse<ConfiguracionReservaResponse>> findById(@PathVariable Long id){
+    public ResponseEntity<ApiResponse<ConfiguracionReservaResponse>> findAll() {
         try {
-            ConfiguracionReservaResponse configuracionReservaResponse = configuracionReservaService.findById(id);
+            ConfiguracionReservaResponse configuracionReservaResponse = configuracionReservaService.findAll();
             return ResponseEntity.ok(
                     ApiResponse.<ConfiguracionReservaResponse>builder()
                             .code(200)
                             .success(true)
-                            .message("Configuración de Reserva encontrada")
+                            .message("Configuración de Reserva obtenida exitosamente")
                             .data(configuracionReservaResponse)
                             .build()
             );
@@ -60,7 +60,7 @@ public class ConfiguracionReservaController {
                     ApiResponse.<ConfiguracionReservaResponse>builder()
                             .code(400)
                             .success(false)
-                            .message("Error al encontrar la configuración de reserva: " + e.getMessage())
+                            .message("Error al obtener la configuración de reserva: " + e.getMessage())
                             .build()
             );
         }

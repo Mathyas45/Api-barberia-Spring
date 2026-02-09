@@ -45,8 +45,11 @@ public class ConfiguracionReservaService {
     }
 
     @Transactional(readOnly = true)
-    public ConfiguracionReservaResponse findById(Long id) {
-        ConfiguracionReserva configuracionReserva = configuracionReservaRepository.findById(id).orElseThrow(() -> new RuntimeException("Configuración de Reserva no encontrada con ID: " + id));
+    public ConfiguracionReservaResponse findAll(){
+        // MULTI-TENANT: Obtener negocioId del JWT
+        Long negocioId = securityContextService.getNegocioIdFromContext();
+        ConfiguracionReserva configuracionReserva = configuracionReservaRepository.findByNegocioId(negocioId)
+                .orElseThrow(() -> new RuntimeException("Configuración de Reserva no encontrada para el negocio con ID: " + negocioId));
         return configuracionReservaMapper.toResponse(configuracionReserva);
     }
 
