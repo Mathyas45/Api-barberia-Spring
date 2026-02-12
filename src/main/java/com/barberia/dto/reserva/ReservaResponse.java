@@ -1,5 +1,9 @@
 package com.barberia.dto.reserva;
 
+import com.barberia.dto.Profesional.ProfesionalResponse;
+import com.barberia.dto.cliente.ClienteResponse;
+import com.barberia.models.Cliente;
+import com.barberia.models.Profesional;
 import com.barberia.models.enums.EstadoReserva;
 import com.barberia.models.enums.TipoReserva;
 import lombok.Data;
@@ -30,8 +34,8 @@ public class ReservaResponse {
 
     // Información legible (nombres)
     private String negocioNombre;
-    private String profesionalNombre;
-    private String clienteNombre;
+    private ProfesionalResponse profesional;
+    private ClienteResponse cliente;
     
     // Lista de servicios incluidos
     private List<ServicioReservaDTO> servicios;

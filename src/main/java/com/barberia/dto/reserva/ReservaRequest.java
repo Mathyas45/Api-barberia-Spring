@@ -30,6 +30,4 @@ public class ReservaRequest {
 
     @NotEmpty(message = "Debe seleccionar al menos un servicio")
     private List<Long> serviciosIds;
-
-    private TipoReserva tipo; // CLIENTE / ADMIN / WALK_IN
 }

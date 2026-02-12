@@ -19,6 +19,8 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
 
+import static com.barberia.models.enums.TipoReserva.INTERNA;
+
 @Service
 public class ReservaService {
 
@@ -73,6 +75,7 @@ public class ReservaService {
         Integer anticipacionDias = configReserva.getAnticipacionMaximaDias();
         Integer anticipacionHoras = configReserva.getAnticipacionHoras();
         Integer anticipacionMinimaHoras = configReserva.getAnticipacionMinimaHoras();
+
         LocalDate fechaReserva = request.getFecha();
 
         if (fechaReserva == null || request.getHoraInicio() == null) {
@@ -163,7 +166,7 @@ public class ReservaService {
         Long negocioId = securityContextService.getNegocioIdFromContext();
 
         Reserva reserva = reservaMapper.toEntity(request);
-
+        reserva.setTipo(INTERNA);
         Negocio negocio = negocioRepository.findById(negocioId)
                 .orElseThrow(() -> new RuntimeException("Negocio no existe"));
         reserva.setNegocio(negocio);

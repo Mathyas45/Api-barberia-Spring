@@ -12,12 +12,19 @@ import org.springframework.stereotype.Component;
 @Component// sirve para que spring lo detecte como un bean es decir un componente gestionado por el contenedor de spring
 public class ReservaMapper {
 
+    private final ProfesionalMapper profesionalMapper;
+    private final ClienteMapper clienteMapper;
+
+    public ReservaMapper(ProfesionalMapper profesionalMapper, ClienteMapper clienteMapper) {
+        this.profesionalMapper = profesionalMapper;
+        this.clienteMapper = clienteMapper;
+    }
+
     public Reserva toEntity(ReservaRequest request) {
         Reserva reserva = new Reserva();
 
         reserva.setFecha(request.getFecha());
         reserva.setHoraInicio(request.getHoraInicio());
-        reserva.setTipo(request.getTipo());
         reserva.setEstado(EstadoReserva.PENDIENTE);
         reserva.setRegEstado(1);
 
@@ -45,16 +52,14 @@ public class ReservaMapper {
         
         // Profesional
         if (reserva.getProfesional() != null) {
-            response.setProfesionalId(reserva.getProfesional().getId());
-            response.setProfesionalNombre(reserva.getProfesional().getNombreCompleto()); // Agregar nombre del profesional
+            response.setProfesional(profesionalMapper.toResponse(reserva.getProfesional()));
         }
-        
+
         // Cliente
         if (reserva.getCliente() != null) {
-            response.setClienteId(reserva.getCliente().getId());
-            response.setClienteNombre(reserva.getCliente().getNombreCompleto());
+            response.setCliente(clienteMapper.toResponse(reserva.getCliente()));
         }
-        
+
         // Servicios
         if (reserva.getServicios() != null && !reserva.getServicios().isEmpty()) {
             response.setServicios(
@@ -85,7 +90,6 @@ public class ReservaMapper {
     public Reserva updateEntity(Reserva reserva, ReservaRequest request) {
         reserva.setFecha(request.getFecha());
         reserva.setHoraInicio(request.getHoraInicio());
-        reserva.setTipo(request.getTipo());
         reserva.setRegEstado(2); // Por defecto actualizado
         return reserva;
     }
