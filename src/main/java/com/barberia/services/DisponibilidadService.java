@@ -2,6 +2,7 @@ package com.barberia.services;
 
 import com.barberia.dto.disponibilidad.DisponibilidadRequest;
 import com.barberia.dto.disponibilidad.DisponibilidadResponse;
+import com.barberia.mappers.ProfesionalMapper;
 import com.barberia.models.*;
 import com.barberia.models.enums.DiaSemana;
 import com.barberia.repositories.*;
@@ -23,6 +24,7 @@ public class DisponibilidadService {
     private final ProfesionalRepository profesionalRepository;
     private final ReservaRepository reservaRepository;
     private final SecurityContextService securityContextService;
+    private final ProfesionalMapper profesionalMapper;
 
     public DisponibilidadService(HorarioProfesionalRepository horarioProfesionalRepo,
                                  HorarioNegocioRepository horarioNegocioRepo,
@@ -30,7 +32,8 @@ public class DisponibilidadService {
                                  ConfiguracionReservaRepository configRepo,
                                  ProfesionalRepository profesionalRepository,
                                  ReservaRepository reservaRepository,
-                                 SecurityContextService securityContextService) {
+                                 SecurityContextService securityContextService,
+                                 ProfesionalMapper profesionalMapper) {
         this.reservaRepository = reservaRepository;
         this.horarioProfesionalRepo = horarioProfesionalRepo;
         this.horarioNegocioRepo = horarioNegocioRepo;
@@ -38,6 +41,7 @@ public class DisponibilidadService {
         this.configRepo = configRepo;
         this.profesionalRepository = profesionalRepository;
         this.securityContextService = securityContextService;
+        this.profesionalMapper = profesionalMapper;
     }
 
 
@@ -143,7 +147,7 @@ public class DisponibilidadService {
         // Crear respuesta con todas las horas disponibles
         DisponibilidadResponse response = new DisponibilidadResponse();
         response.setProfesionalId(request.getProfesionalId());
-        response.setProfesionalNombre(profesional.getNombreCompleto());
+        response.setProfesional(profesionalMapper.toResponse(profesional));
         response.setFecha(fecha);
         response.setHorasDisponibles(horasDisponibles);
         response.setCantidadHorasDisponibles(horasDisponibles.size());

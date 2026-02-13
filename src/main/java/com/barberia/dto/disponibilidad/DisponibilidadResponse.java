@@ -1,5 +1,6 @@
 package com.barberia.dto.disponibilidad;
 
+import com.barberia.dto.Profesional.ProfesionalResponse;
 import lombok.Data;
 
 import java.time.LocalDate;
@@ -11,8 +12,7 @@ public class DisponibilidadResponse {
 
     private LocalDate fecha;
     private Long profesionalId;
-    private String profesionalNombre;
+    private ProfesionalResponse profesional;
     private List<LocalTime> horasDisponibles;
-    private Integer duracionServicioMinutos;
     private Integer cantidadHorasDisponibles;
 }
