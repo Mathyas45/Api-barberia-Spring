@@ -25,13 +25,13 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
     
     /**
      * Busca un usuario por email
-     * 
+     *
      * Spring Data JPA genera automáticamente la query SQL:
      * SELECT * FROM usuarios WHERE email = ?
-     * 
+     *
      * Optional: Evita NullPointerException
      * Si no encuentra el usuario, devuelve Optional.empty()
-     * 
+     *
      * @param email Email del usuario
      * @return Optional con el usuario o vacío
      */
@@ -63,5 +63,26 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long> {
            "LEFT JOIN FETCH r.permissions " +
            "WHERE u.email = :email")
     Optional<Usuario> findByEmailWithRolesAndPermissions(@Param("email") String email);
+
+    /**
+     * Busca usuarios por negocioId excluyendo estado 0
+     */
+    @Query("SELECT u FROM Usuario u WHERE u.negocioId = :negocioId AND u.regEstado <> :regEstado")
+    java.util.List<Usuario> findByNegocioIdAndRegEstadoNot(@Param("negocioId") Long negocioId, @Param("regEstado") Integer regEstado);
+
+    /**
+     * Busca usuarios por negocioId y nombre o email conteniendo texto
+     */
+    @Query("SELECT u FROM Usuario u WHERE u.negocioId = :negocioId AND (LOWER(u.name) LIKE LOWER(CONCAT('%', :name, '%')) OR LOWER(u.email) LIKE LOWER(CONCAT('%', :email, '%'))) AND u.regEstado <> :regEstado")
+    java.util.List<Usuario> findByNegocioIdAndNameContainingIgnoreCaseOrEmailContainingIgnoreCaseAndRegEstadoNot(
+            @Param("negocioId") Long negocioId,
+            @Param("name") String name,
+            @Param("email") String email,
+            @Param("regEstado") Integer regEstado
+    );
+
+    /**
+     * Busca usuario por email sin Optional
+     */
 }
 

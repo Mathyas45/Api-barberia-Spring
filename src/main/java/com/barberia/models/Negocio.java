@@ -78,6 +78,10 @@ public class Negocio {
      */
     @Column(nullable = false, length = 20)
     private String estado = "ACTIVO";
+
+//color elegido para el negocio, para personalizar la apariencia del panel administrativo
+    @Column(length = 7)
+    private String colorPrincipal = "#000000"; // valor por defecto
     
     /**
      * Fecha de registro del negocio

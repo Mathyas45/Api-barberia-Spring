@@ -21,15 +21,24 @@ public interface NegocioRepository extends JpaRepository<Negocio, Long> {
      *
      * Buscar negocio por RUC
      */
-    Optional<Negocio> findByRuc(String ruc);
-    
+
     /**
      * Verificar si existe un negocio con un RUC
      */
     boolean existsByRuc(String ruc);
-    
+
     /**
      * Buscar negocio por nombre
      */
     Optional<Negocio> findByNombre(String nombre);
+
+    /**
+     * Buscar negocios por nombre o RUC conteniendo texto
+     */
+    java.util.List<Negocio> findByNombreContainingIgnoreCaseOrRucContainingIgnoreCase(String nombre, String ruc);
+
+    /**
+     * Buscar negocio por RUC sin Optional
+     */
+    Negocio findByRuc(String ruc);
 }

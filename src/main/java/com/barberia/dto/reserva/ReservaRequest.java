@@ -22,7 +22,6 @@ public class ReservaRequest {
     private Long clienteId; // puede ser null para walk-in
 
     @NotNull(message = "La fecha es obligatoria")
-    @FutureOrPresent(message = "La fecha no puede ser pasada")
     private LocalDate fecha;
     
     @NotNull(message = "La hora de inicio es obligatoria")

@@ -12,15 +12,6 @@ import java.util.Optional;
 @Repository
 public interface RolRepository extends JpaRepository<Rol, Long> {
 
-    /**
-     * Busca un rol por nombre
-     *
-     * @param name nombre del rol (ADMIN, USER, MANAGER)
-     * @return Optional con el rol si existe
-     *
-     * Usado al registrar usuarios para asignarles el rol USER por defecto
-     */
-    Optional<Rol> findByName(String name);
 
     /**
      * Verifica si existe un rol con ese nombre
@@ -29,4 +20,14 @@ public interface RolRepository extends JpaRepository<Rol, Long> {
      * @return true si existe, false si no
      */
     Boolean existsByName(String name);
+
+    /**
+     * Busca roles por nombre conteniendo texto (sin Optional)
+     */
+    java.util.List<Rol> findByNameContainingIgnoreCase(String name);
+
+    /**
+     * Busca un rol por nombre (sin Optional)
+     */
+    Rol findByName(String name);
 }

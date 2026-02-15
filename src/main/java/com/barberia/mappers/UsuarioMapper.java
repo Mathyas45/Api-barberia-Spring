@@ -1,13 +1,18 @@
 package com.barberia.mappers;
 
 import com.barberia.dto.auth.AuthResponse;
+import com.barberia.dto.usuario.UsuarioRequest;
+import com.barberia.dto.usuario.UsuarioResponse;
+import com.barberia.dto.usuario.UsuarioUpdateRequest;
 import com.barberia.models.Permiso;
 import com.barberia.models.Rol;
 import com.barberia.models.Usuario;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -120,5 +125,64 @@ public class UsuarioMapper {
                 .flatMap(rol -> rol.getPermissions().stream())
                 .map(Permiso::getName)
                 .collect(Collectors.toSet());
+    }
+
+    /**
+     * Convierte UsuarioRequest a Usuario (entidad)
+     * Utilizado al crear un nuevo usuario
+     */
+    public Usuario toEntity(UsuarioRequest request, PasswordEncoder passwordEncoder) {
+        Usuario usuario = new Usuario();
+        usuario.setName(request.getName());
+        usuario.setEmail(request.getEmail());
+        usuario.setPassword(passwordEncoder.encode(request.getPassword()));
+        usuario.setRegEstado(1); // Activo por defecto
+        usuario.setRoles(new HashSet<>());
+        return usuario;
+    }
+
+    /**
+     * Convierte Usuario a UsuarioResponse
+     * Incluye roles y permisos asociados
+     */
+    public UsuarioResponse toResponse(Usuario usuario) {
+        UsuarioResponse response = new UsuarioResponse();
+        response.setId(usuario.getId());
+        response.setName(usuario.getName());
+        response.setEmail(usuario.getEmail());
+        response.setNegocioId(usuario.getNegocioId());
+        
+        if (usuario.getNegocio() != null) {
+            response.setNegocioNombre(usuario.getNegocio().getNombre());
+        }
+        
+        response.setRegEstado(usuario.getRegEstado());
+        response.setCreatedAt(usuario.getCreatedAt());
+        response.setUpdatedAt(usuario.getUpdatedAt());
+
+        // Mapear roles con permisos
+        Set<UsuarioResponse.RolSimpleResponse> rolesResponse = usuario.getRoles().stream()
+                .map(rol -> {
+                    UsuarioResponse.RolSimpleResponse rolResponse = new UsuarioResponse.RolSimpleResponse();
+                    rolResponse.setId(rol.getId());
+                    rolResponse.setName(rol.getName());
+                    rolResponse.setDescription(rol.getDescription());
+                    return rolResponse;
+                })
+                .collect(Collectors.toSet());
+        
+        response.setRoles(rolesResponse);
+        
+        return response;
+    }
+
+    /**
+     * Actualiza los datos de un usuario existente
+     */
+    public Usuario updateEntity(Usuario usuario, UsuarioUpdateRequest request) {
+        usuario.setName(request.getName());
+        usuario.setEmail(request.getEmail());
+        usuario.setRegEstado(2); // Actualizado
+        return usuario;
     }
 }

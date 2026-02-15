@@ -27,4 +27,9 @@ public interface PermisoRepository extends JpaRepository<Permiso, Long> {
      * @return true si existe, false si no
      */
     Boolean existsByName(String name);
+
+    /**
+     * Busca permisos por nombre conteniendo texto
+     */
+    java.util.List<Permiso> findByNameContainingIgnoreCase(String name);
 }

@@ -296,13 +296,16 @@ public class ReservaService {
 
         Reserva reservaActualizada = reservaMapper.updateEntity(reserva, request);
 
-        if (reservaActualizada.getFecha().isBefore(fechaActual)) {
-            throw new RuntimeException("No se puede reservar en fechas pasadas");
-        }
+        // Validar fecha solo si se está intentando modificar
+        if (!reserva.getFecha().equals(reservaActualizada.getFecha())) {
+            if (reservaActualizada.getFecha().isBefore(fechaActual)) {
+                throw new RuntimeException("No se puede reservar en fechas pasadas");
+            }
 
-        if (reservaActualizada.getFecha().isEqual(fechaActual)) {
-            if (request.getHoraInicio().isBefore(LocalTime.now())) {
-                throw new RuntimeException("No se puede reservar en una hora pasada");
+            if (reservaActualizada.getFecha().isEqual(fechaActual)) {
+                if (request.getHoraInicio().isBefore(LocalTime.now())) {
+                    throw new RuntimeException("No se puede reservar en una hora pasada");
+                }
             }
         }
 
