@@ -34,6 +34,18 @@ public class Profesional {
     @Column(length = 255, nullable = true)
     private String direccion;
 
+    /** Especialidad del profesional (ej: "Cortes clásicos", "Colorimetría") */
+    @Column(length = 150)
+    private String especialidad;
+
+    /** Descripción breve del profesional */
+    @Column(length = 500)
+    private String descripcion;
+
+    /** URL de la foto del profesional */
+    @Column(name = "foto_url", length = 500)
+    private String fotoUrl;
+
     @Column(nullable = false, columnDefinition = "BOOLEAN DEFAULT true")
     private Boolean usaHorarioNegocio;
 

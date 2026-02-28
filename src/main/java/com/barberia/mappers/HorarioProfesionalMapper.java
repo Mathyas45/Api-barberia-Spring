@@ -16,8 +16,8 @@ public class HorarioProfesionalMapper {
 
     public HorarioProfesional toEntity(HorarioProfesionalRequest request) {
         HorarioProfesional horario = new HorarioProfesional(); // esto sirve para crear una nueva instancia de la clase HorarioProfesional, la instancia es un objeto que representa un horario de profesional en el sistema
-        Profesional profesional = profesionalRepository.findById(request.getProfesional_id())
-                .orElseThrow(() -> new IllegalArgumentException("Categoria no encontrado con ID: " + request.getProfesional_id()));
+        Profesional profesional = profesionalRepository.findById(request.getProfesionalId())
+                .orElseThrow(() -> new IllegalArgumentException("Categoria no encontrado con ID: " + request.getProfesionalId()));
         horario.setProfesional(profesional);
         horario.setDiaSemana(request.getDiaSemana());
         horario.setHoraInicio(request.getHoraInicio());
@@ -43,8 +43,8 @@ public class HorarioProfesionalMapper {
     }
 
     public HorarioProfesional updateEntity(HorarioProfesional horario, HorarioProfesionalRequest request) {
-        Profesional profesional = profesionalRepository.findById(request.getProfesional_id())
-                .orElseThrow(() -> new IllegalArgumentException("Categoria no encontrado con ID: " + request.getProfesional_id()));
+        Profesional profesional = profesionalRepository.findById(request.getProfesionalId())
+                .orElseThrow(() -> new IllegalArgumentException("Categoria no encontrado con ID: " + request.getProfesionalId()));
         horario.setProfesional(profesional);
         horario.setDiaSemana(request.getDiaSemana());
         horario.setHoraInicio(request.getHoraInicio());

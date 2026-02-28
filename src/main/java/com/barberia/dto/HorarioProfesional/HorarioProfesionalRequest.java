@@ -9,7 +9,7 @@ import java.time.LocalTime;
 @Data
 public class HorarioProfesionalRequest {
 
-    public Long profesional_id;
+    public Long profesionalId;
     @NotNull(message = "El dia de Semana es obligatorio")
     public DiaSemana diaSemana;
     @NotNull(message = "La hora de Inicio es obligatoria")

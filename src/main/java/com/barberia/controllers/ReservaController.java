@@ -71,7 +71,7 @@ public class ReservaController {
     }
 
     @GetMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN') or hasAuthority('READ_RESERVAS')")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('READ_BOOKING')")
     public ResponseEntity<ApiResponse<ReservaResponse>> findById(@PathVariable Long id){
         try {
             ReservaResponse reservaResponse = reservaService.findById(id);
@@ -94,8 +94,8 @@ public class ReservaController {
         }
     }
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN') or hasAuthority('READ_RESERVAS')")
-    public ResponseEntity<ApiResponse<List<ReservaResponse>>> findAll(
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('READ_BOOKING')")
+        public ResponseEntity<ApiResponse<List<ReservaResponse>>> findAll(
             @RequestParam(required = false) Long profesionalId,
             @RequestParam(required = false) Long clienteId,
             @RequestParam(required = false) LocalDate fechaDesde,

@@ -48,10 +48,18 @@ public interface HorarioProfesionalRepository  extends JpaRepository<HorarioProf
     SELECT h
     FROM HorarioProfesional h
     WHERE (:profesionalId IS NULL OR h.profesional.id = :profesionalId)
+      AND h.regEstado != 0
+    """)
+    List<HorarioProfesional> findByProfesional(Long profesionalId);
+
+    @Query("""
+    SELECT h
+    FROM HorarioProfesional h
+    WHERE (:profesionalId IS NULL OR h.profesional.id = :profesionalId)
       AND (:diaSemana IS NULL OR h.diaSemana = :diaSemana)
       AND h.regEstado != 0
     """)
-    List<HorarioProfesional> findByProfesionalAndDiaSemana(Long profesionalId, DiaSemana diaSemana);
+    List<HorarioProfesional>findByProfesionalAndDiaSemana (Long profesionalId, DiaSemana diaSemana);
 
 
 

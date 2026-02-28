@@ -27,6 +27,7 @@ public class HorarioProfesionalService {
 
     @Transactional
     public HorarioProfesionalResponse create(HorarioProfesionalRequest request) {
+        System.out.println("Profesional ID en Service: " + request.getProfesionalId());
         HorarioProfesional horarioProfesional = horarioProfesionalMapper.toEntity(request);
 
         if (!horarioProfesional.getHoraInicio().isBefore(request.getHoraFin())) {
@@ -34,7 +35,7 @@ public class HorarioProfesionalService {
         }
 
         if (horarioProfesionalRepository.existeSolapamiento(
-                request.getProfesional_id(), request.getDiaSemana(), request.getHoraInicio(), request.getHoraFin())) {
+                request.getProfesionalId(), request.getDiaSemana(), request.getHoraInicio(), request.getHoraFin())) {
             throw new RuntimeException("El horario se cruza con un horario existente para el mismo profesional en el mismo día.");
         }
 
@@ -51,9 +52,11 @@ public class HorarioProfesionalService {
         return horarioProfesionalMapper.toResponse(horarioProfesional);
     }
 
+
     @Transactional(readOnly = true)
-    public List<HorarioProfesionalResponse> findAll(Long profesionalId, DiaSemana diaSemana) {
-        List<HorarioProfesional> horariosProfesionales = horarioProfesionalRepository.findByProfesionalAndDiaSemana(profesionalId, diaSemana);
+    public List<HorarioProfesionalResponse> findAll(Long profesionalId) {
+        System.out.println("Profesional ID: " + profesionalId);
+        List<HorarioProfesional> horariosProfesionales = horarioProfesionalRepository.findByProfesional(profesionalId);
 
         return horariosProfesionales.stream()
                 .map(horarioProfesionalMapper::toResponse)

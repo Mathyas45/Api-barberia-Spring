@@ -52,6 +52,18 @@ public class Usuario {
 
     @Column(nullable = false, length = 100)
     private String password;
+
+    @Column(length = 20)
+    private String telefono;
+
+    /**
+     * Tipo de usuario:
+     * 1 = Interno (ADMIN, BARBERO, RECEPCIONISTA)
+     * 2 = Cliente
+     */
+    @Column(name = "tipo_usuario", nullable = false, columnDefinition = "INTEGER DEFAULT 1")
+    @Builder.Default
+    private Integer tipoUsuario = 1;
     
     @Column(name = "negocio_id", nullable = false)
     private Long negocioId;
@@ -84,6 +96,7 @@ public class Usuario {
             joinColumns = @JoinColumn(name = "usuario_id"),
             inverseJoinColumns = @JoinColumn(name = "rol_id")
     )
+
 
     @ToString.Exclude
     @EqualsAndHashCode.Exclude

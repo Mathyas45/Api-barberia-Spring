@@ -1,9 +1,11 @@
 package com.barberia.controllers;
 
 import com.barberia.dto.ApiResponse;
+import com.barberia.dto.usuario.UsuarioPerfilRequest;
 import com.barberia.dto.usuario.UsuarioRequest;
 import com.barberia.dto.usuario.UsuarioResponse;
 import com.barberia.dto.usuario.UsuarioUpdateRequest;
+import org.springframework.http.HttpStatus;
 import com.barberia.services.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -59,10 +61,7 @@ public class UsuarioController {
         }
     }
 
-    /**
-     * Obtener usuario por ID
-     * SEGURIDAD: Requiere rol ADMIN o permiso READ_USERS
-     */
+
     @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('READ_USERS')")
     public ResponseEntity<ApiResponse<UsuarioResponse>> findById(@PathVariable Long id) {
@@ -85,10 +84,6 @@ public class UsuarioController {
         }
     }
 
-    /**
-     * Listar todos los usuarios con búsqueda opcional
-     * SEGURIDAD: Requiere rol ADMIN o permiso READ_USERS
-     */
     @GetMapping
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('READ_USERS')")
     public ResponseEntity<ApiResponse<List<UsuarioResponse>>> findAll(
@@ -112,11 +107,7 @@ public class UsuarioController {
         }
     }
 
-    /**
-     * Actualizar usuario
-     * SEGURIDAD: Requiere rol ADMIN o permiso UPDATE_USERS
-     */
-    @PutMapping("/{id}")
+    @PutMapping("update/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('UPDATE_USERS')")
     public ResponseEntity<ApiResponse<UsuarioResponse>> update(
             @PathVariable Long id,
@@ -140,10 +131,6 @@ public class UsuarioController {
         }
     }
 
-    /**
-     * Eliminar usuario (soft delete)
-     * SEGURIDAD: Requiere rol ADMIN o permiso DELETE_USERS
-     */
     @DeleteMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('DELETE_USERS')")
     public ResponseEntity<ApiResponse<Void>> delete(@PathVariable Long id) {
@@ -166,9 +153,32 @@ public class UsuarioController {
     }
 
     /**
-     * Activar usuario
-     * SEGURIDAD: Requiere rol ADMIN o permiso UPDATE_USERS
+     * Actualizar perfil propio: nombre, email, telefono, password.
      */
+    @PutMapping("/perfil/{id}")
+    @PreAuthorize("isAuthenticated()")
+    public ResponseEntity<ApiResponse<UsuarioResponse>> updatePerfil(
+            @PathVariable Long id,
+            @Valid @RequestBody UsuarioPerfilRequest request) {
+        try {
+            UsuarioResponse usuarioResponse = usuarioService.updatePerfil(id, request);
+            ApiResponse<UsuarioResponse> response = ApiResponse.<UsuarioResponse>builder()
+                    .code(200)
+                    .success(true)
+                    .message("Perfil actualizado exitosamente")
+                    .data(usuarioResponse)
+                    .build();
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            ApiResponse<UsuarioResponse> response = ApiResponse.<UsuarioResponse>builder()
+                    .code(400)
+                    .success(false)
+                    .message("Error al actualizar el perfil: " + e.getMessage())
+                    .build();
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
     @PutMapping("/{id}/activate")
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('UPDATE_USERS')")
     public ResponseEntity<ApiResponse<Void>> activate(@PathVariable Long id) {

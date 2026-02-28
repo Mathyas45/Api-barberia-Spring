@@ -1,6 +1,7 @@
 package com.barberia.mappers;
 
 import com.barberia.dto.auth.AuthResponse;
+import com.barberia.dto.usuario.UsuarioPerfilRequest;
 import com.barberia.dto.usuario.UsuarioRequest;
 import com.barberia.dto.usuario.UsuarioResponse;
 import com.barberia.dto.usuario.UsuarioUpdateRequest;
@@ -30,7 +31,13 @@ import java.util.stream.Collectors;
  */
 @Component
 public class UsuarioMapper {
-    
+
+    private final RolMapper rolMapper;
+
+    public UsuarioMapper(RolMapper rolMapper) {
+        this.rolMapper = rolMapper;
+    }
+
     /**
      * Convierte Usuario + JWT a AuthResponse (CON MULTI-TENANT)
      * 
@@ -136,6 +143,8 @@ public class UsuarioMapper {
         usuario.setName(request.getName());
         usuario.setEmail(request.getEmail());
         usuario.setPassword(passwordEncoder.encode(request.getPassword()));
+        usuario.setTelefono(request.getTelefono());
+        usuario.setTipoUsuario(request.getTipoUsuario() != null ? request.getTipoUsuario() : 1);
         usuario.setRegEstado(1); // Activo por defecto
         usuario.setRoles(new HashSet<>());
         return usuario;
@@ -148,41 +157,54 @@ public class UsuarioMapper {
     public UsuarioResponse toResponse(Usuario usuario) {
         UsuarioResponse response = new UsuarioResponse();
         response.setId(usuario.getId());
-        response.setName(usuario.getName());
+        response.setNombre(usuario.getName());
         response.setEmail(usuario.getEmail());
+        response.setTelefono(usuario.getTelefono());
+        response.setTipoUsuario(usuario.getTipoUsuario());
         response.setNegocioId(usuario.getNegocioId());
         
         if (usuario.getNegocio() != null) {
             response.setNegocioNombre(usuario.getNegocio().getNombre());
         }
-        
+        usuario.getRoles().stream().findFirst()
+                .ifPresent(rol -> response.setRoles(rolMapper.toResponse(rol)));// Solo asigna el primer rol encontrado (ajustar si se permiten múltiples roles)
         response.setRegEstado(usuario.getRegEstado());
         response.setCreatedAt(usuario.getCreatedAt());
         response.setUpdatedAt(usuario.getUpdatedAt());
 
-        // Mapear roles con permisos
-        Set<UsuarioResponse.RolSimpleResponse> rolesResponse = usuario.getRoles().stream()
-                .map(rol -> {
-                    UsuarioResponse.RolSimpleResponse rolResponse = new UsuarioResponse.RolSimpleResponse();
-                    rolResponse.setId(rol.getId());
-                    rolResponse.setName(rol.getName());
-                    rolResponse.setDescription(rol.getDescription());
-                    return rolResponse;
-                })
-                .collect(Collectors.toSet());
-        
-        response.setRoles(rolesResponse);
-        
+
         return response;
     }
 
     /**
-     * Actualiza los datos de un usuario existente
+     * Actualiza datos completos de un usuario (incluye roles, gestionado desde el servicio)
      */
     public Usuario updateEntity(Usuario usuario, UsuarioUpdateRequest request) {
+        usuario.setName(request.getNombre());
+        usuario.setEmail(request.getEmail());
+        if (request.getTelefono() != null) {
+            usuario.setTelefono(request.getTelefono());
+        }
+        if (request.getTipoUsuario() != null) {
+            usuario.setTipoUsuario(request.getTipoUsuario());
+        }
+        usuario.setRegEstado(1);
+        return usuario;
+    }
+
+    /**
+     * Actualiza solo el perfil del usuario: nombre, email, telefono y password.
+     * NO modifica roles ni tipoUsuario.
+     */
+    public Usuario updatePerfilEntity(Usuario usuario, UsuarioPerfilRequest request, PasswordEncoder passwordEncoder) {
         usuario.setName(request.getName());
         usuario.setEmail(request.getEmail());
-        usuario.setRegEstado(2); // Actualizado
+        if (request.getTelefono() != null) {
+            usuario.setTelefono(request.getTelefono());
+        }
+        if (request.getPassword() != null && !request.getPassword().isBlank()) {
+            usuario.setPassword(passwordEncoder.encode(request.getPassword()));
+        }
         return usuario;
     }
 }

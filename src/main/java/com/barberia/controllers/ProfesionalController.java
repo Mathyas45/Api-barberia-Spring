@@ -7,9 +7,11 @@ import com.barberia.dto.Profesional.ProfesionalResponse;
 import com.barberia.services.ProfesionalService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -23,11 +25,13 @@ public class ProfesionalController {
     }
 
 
-    @PostMapping({"/register"})
+    @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('CREATE_PROFESSIONALS')")
-    public ResponseEntity<ApiResponse<ProfesionalResponse>> create(@Valid @RequestBody ProfesionalRequest request) {
+    public ResponseEntity<ApiResponse<ProfesionalResponse>> create(
+            @Valid @RequestPart("profesional") ProfesionalRequest request,
+            @RequestPart(value = "foto", required = false) MultipartFile foto) {
         try {
-            ProfesionalResponse profesionalResponse = profesionalService.create(request);
+            ProfesionalResponse profesionalResponse = profesionalService.create(request, foto);
             return ResponseEntity.status(HttpStatus.CREATED).body(
                     ApiResponse.<ProfesionalResponse>builder()
                             .code(201)
@@ -93,11 +97,14 @@ public class ProfesionalController {
         }
     }
 
-    @PutMapping("/update/{id}")
+    @PutMapping(value = "/update/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('UPDATE_PROFESSIONALS')")
-    public ResponseEntity<ApiResponse<ProfesionalResponse>> update(@PathVariable Long id, @Valid @RequestBody ProfesionalRequest request) {
+    public ResponseEntity<ApiResponse<ProfesionalResponse>> update(
+            @PathVariable Long id,
+            @Valid @RequestPart("profesional") ProfesionalRequest request,
+            @RequestPart(value = "foto", required = false) MultipartFile foto) {
         try {
-            ProfesionalResponse profesionalResponse = profesionalService.update(id, request);
+            ProfesionalResponse profesionalResponse = profesionalService.update(id, request, foto);
             return ResponseEntity.ok(
                     ApiResponse.<ProfesionalResponse>builder()
                             .code(200)
@@ -160,6 +167,32 @@ public class ProfesionalController {
                             .code(400)
                             .success(false)
                             .message("Error al actualizar el estado del profesional: " + e.getMessage())
+                            .build()
+            );
+        }
+    }
+
+    @PostMapping("/{id}/foto")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('UPDATE_PROFESSIONALS')")
+    public ResponseEntity<ApiResponse<ProfesionalResponse>> uploadFoto(
+            @PathVariable Long id,
+            @RequestParam("foto") MultipartFile foto) {
+        try {
+            ProfesionalResponse response = profesionalService.uploadFoto(id, foto);
+            return ResponseEntity.ok(
+                    ApiResponse.<ProfesionalResponse>builder()
+                            .code(200)
+                            .success(true)
+                            .message("Foto del profesional actualizada exitosamente")
+                            .data(response)
+                            .build()
+            );
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(
+                    ApiResponse.<ProfesionalResponse>builder()
+                            .code(400)
+                            .success(false)
+                            .message("Error al subir la foto: " + e.getMessage())
                             .build()
             );
         }

@@ -13,6 +13,7 @@ import com.barberia.repositories.ServicioRepository;
 import com.barberia.services.common.SecurityContextService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.math.BigDecimal;
 import java.util.List;
@@ -26,15 +27,18 @@ public class ServicioService {
     private final ServicioRepository servicioRepository;
     private final ServicioMapper servicioMapper;
     private final SecurityContextService securityContextService;
+    private final FileStorageService fileStorageService;
 
-    public ServicioService(ServicioRepository servicioRepository, ServicioMapper servicioMapper, SecurityContextService securityContextService) {
+    public ServicioService(ServicioRepository servicioRepository, ServicioMapper servicioMapper,
+                           SecurityContextService securityContextService, FileStorageService fileStorageService) {
         this.servicioRepository = servicioRepository;
         this.servicioMapper = servicioMapper;
         this.securityContextService = securityContextService;
+        this.fileStorageService = fileStorageService;
     }
 
     @Transactional
-    public ServicioResponse create(ServicioRequest request) {
+    public ServicioResponse create(ServicioRequest request, MultipartFile imagen) {
         Long negocioId = securityContextService.getNegocioIdFromContext();
         Servicio servicio = servicioMapper.toEntity(request);
 
@@ -46,6 +50,12 @@ public class ServicioService {
 
         if (servicio.getPrecio().compareTo(BigDecimal.ZERO) < 0) {
             throw new RuntimeException("El precio no puede ser negativo.");
+        }
+
+        // Guardar imagen del servicio si se proporcionó
+        if (imagen != null && !imagen.isEmpty()) {
+            String imagenUrl = fileStorageService.saveImage(imagen, "servicios");
+            servicio.setImagenUrl(imagenUrl);
         }
 
         Servicio nuevoServicio = servicioRepository.save(servicio);
@@ -86,10 +96,21 @@ public class ServicioService {
     }
 
     @Transactional
-    public ServicioResponse update(Long id, ServicioUpdateRequest request) {
+    public ServicioResponse update(Long id, ServicioUpdateRequest request, MultipartFile imagen) {
         Servicio servicio = servicioRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("Servicio no encontrado con ID: " +id));
         servicioMapper.updateEntity(servicio, request);
+
+        // Guardar nueva imagen si se proporcionó
+        if (imagen != null && !imagen.isEmpty()) {
+            // Eliminar imagen anterior si existe
+            if (servicio.getImagenUrl() != null && !servicio.getImagenUrl().isEmpty()) {
+                fileStorageService.deleteFile(servicio.getImagenUrl());
+            }
+            String imagenUrl = fileStorageService.saveImage(imagen, "servicios");
+            servicio.setImagenUrl(imagenUrl);
+        }
+
         Servicio nuevoServicio =  servicioRepository.save(servicio);
         return servicioMapper.toResponse(nuevoServicio);
     }

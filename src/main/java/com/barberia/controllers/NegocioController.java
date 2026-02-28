@@ -3,12 +3,14 @@ package com.barberia.controllers;
 import com.barberia.dto.ApiResponse;
 import com.barberia.dto.negocio.NegocioRequest;
 import com.barberia.dto.negocio.NegocioResponse;
+import com.barberia.dto.negocio.NegocioUpdateRequest;
 import com.barberia.services.NegocioService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -87,8 +89,8 @@ public class NegocioController {
      * SEGURIDAD: Requiere rol ADMIN o permiso READ_NEGOCIOS
      */
     @GetMapping
-    @PreAuthorize("hasRole('ADMIN') or hasAuthority('READ_NEGOCIOS')")
     public ResponseEntity<ApiResponse<List<NegocioResponse>>> findAll(
+
             @RequestParam(required = false) String query) {
         try {
             List<NegocioResponse> negocios = negocioService.findAll(query);
@@ -110,16 +112,26 @@ public class NegocioController {
     }
 
     /**
-     * Actualizar negocio
+     * Actualizar configuración completa del negocio (con o sin logo/hero)
      * SEGURIDAD: Requiere rol ADMIN
+     * 
+     * IMPORTANTE: Este endpoint acepta multipart/form-data
+     * - 'negocio': JSON con los datos (required)
+     * - 'logo': archivo de imagen del logo (opcional)
+     * - 'heroImage': archivo de imagen del hero/portada (opcional)
+     * 
+     * El logo y heroImage son OPCIONALES - solo se actualizan si se envían
      */
-    @PutMapping("/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    @PutMapping(value = "/update/{id}", consumes = "multipart/form-data")
+    @PreAuthorize("hasRole('ADMIN') or hasAuthority('UPDATE_NEGOCIOS')")
     public ResponseEntity<ApiResponse<NegocioResponse>> update(
             @PathVariable Long id,
-            @Valid @RequestBody NegocioRequest request) {
+            @RequestPart("negocio") @Valid NegocioUpdateRequest updateRequest,
+            @RequestPart(value = "logo", required = false) MultipartFile logo,
+            @RequestPart(value = "heroImage", required = false) MultipartFile heroImage) {
         try {
-            NegocioResponse negocioResponse = negocioService.update(id, request);
+            NegocioResponse negocioResponse = negocioService.updateConfiguracion(id, updateRequest, logo, heroImage);
+            
             ApiResponse<NegocioResponse> response = ApiResponse.<NegocioResponse>builder()
                     .code(200)
                     .success(true)
@@ -127,7 +139,7 @@ public class NegocioController {
                     .data(negocioResponse)
                     .build();
             return ResponseEntity.ok(response);
-        } catch (Exception e) {
+        } catch (RuntimeException e) {
             ApiResponse<NegocioResponse> response = ApiResponse.<NegocioResponse>builder()
                     .code(400)
                     .success(false)
@@ -182,6 +194,32 @@ public class NegocioController {
                     .code(400)
                     .success(false)
                     .message("Error al activar el negocio: " + e.getMessage())
+                    .build();
+            return ResponseEntity.badRequest().body(response);
+        }
+    }
+
+    /**
+     * Eliminar logo del negocio
+     * SEGURIDAD: Requiere rol ADMIN
+     */
+    @DeleteMapping("/{id}/logo")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<ApiResponse<NegocioResponse>> deleteLogo(@PathVariable Long id) {
+        try {
+            NegocioResponse negocioResponse = negocioService.deleteLogo(id);
+            ApiResponse<NegocioResponse> response = ApiResponse.<NegocioResponse>builder()
+                    .code(200)
+                    .success(true)
+                    .message("Logo eliminado exitosamente")
+                    .data(negocioResponse)
+                    .build();
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            ApiResponse<NegocioResponse> response = ApiResponse.<NegocioResponse>builder()
+                    .code(400)
+                    .success(false)
+                    .message("Error al eliminar el logo: " + e.getMessage())
                     .build();
             return ResponseEntity.badRequest().body(response);
         }

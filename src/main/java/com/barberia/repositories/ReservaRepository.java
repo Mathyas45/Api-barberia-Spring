@@ -59,7 +59,8 @@ public interface ReservaRepository extends JpaRepository<Reserva, Long> {
     FROM Reserva r
     WHERE r.negocio.id = :negocioId
       AND (:profesionalId IS NULL OR r.profesional.id = :profesionalId)
-      AND (:fechaDesde IS NULL OR :fechaHasta IS NULL OR r.fecha BETWEEN :fechaDesde AND :fechaHasta)
+      AND (:fechaDesde IS NULL OR r.fecha >= :fechaDesde)
+      AND (:fechaHasta IS NULL OR r.fecha <= :fechaHasta)
       AND (:clienteId IS NULL OR r.cliente.id = :clienteId)
       AND (:estado IS NULL OR r.estado = :estado)
       AND r.regEstado <> 0

@@ -10,9 +10,11 @@ import com.barberia.services.ServicioService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.List;
 
@@ -27,11 +29,13 @@ public class ServicioController {
         this.servicioService = servicioService;
     }
 
-    @PostMapping({"/register"})
+    @PostMapping(value = "/register", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN') or  hasAuthority('CREATE_SERVICIOS')")
-    public  ResponseEntity<ApiResponse<ServicioResponse>>  create( @Valid @RequestBody ServicioRequest request) {
+    public ResponseEntity<ApiResponse<ServicioResponse>> create(
+            @Valid @RequestPart("servicio") ServicioRequest request,
+            @RequestPart(value = "imagen", required = false) MultipartFile imagen) {
         try {
-            ServicioResponse servicioResponse = servicioService.create(request);
+            ServicioResponse servicioResponse = servicioService.create(request, imagen);
             ApiResponse<ServicioResponse> response = ApiResponse.<ServicioResponse>builder()
                     .code(201)
                     .success(true)
@@ -93,11 +97,14 @@ public class ServicioController {
                     .build());
         }
     }
-    @PutMapping("/update/{id}")
+    @PutMapping(value = "/update/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @PreAuthorize("hasRole('ADMIN') or hasAuthority('UPDATE_SERVICIOS')")
-    public ResponseEntity<ApiResponse<ServicioResponse>> update(@PathVariable Long id, @Valid @RequestBody ServicioUpdateRequest request) {
+    public ResponseEntity<ApiResponse<ServicioResponse>> update(
+            @PathVariable Long id,
+            @Valid @RequestPart("servicio") ServicioUpdateRequest request,
+            @RequestPart(value = "imagen", required = false) MultipartFile imagen) {
         try {
-            ServicioResponse response = servicioService.update(id, request);
+            ServicioResponse response = servicioService.update(id, request, imagen);
             return ResponseEntity.ok(ApiResponse.<ServicioResponse>builder()
                     .code(201)
                     .success(true)

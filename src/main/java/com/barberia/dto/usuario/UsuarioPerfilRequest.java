@@ -2,14 +2,12 @@ package com.barberia.dto.usuario;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.NotEmpty;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
-import java.util.List;
 
 @Data
-public class UsuarioRequest {
+public class UsuarioPerfilRequest {
 
     @NotBlank(message = "El nombre es obligatorio")
     @Size(max = 50, message = "El nombre no puede exceder 50 caracteres")
@@ -20,19 +18,13 @@ public class UsuarioRequest {
     @Size(max = 100, message = "El email no puede exceder 100 caracteres")
     private String email;
 
-    @NotBlank(message = "La contraseña es obligatoria")
+    /**
+     * Opcional: si viene con valor, se actualiza la contraseña.
+     * Si viene null o vacío, se conserva la contraseña actual.
+     */
     @Size(min = 6, message = "La contraseña debe tener al menos 6 caracteres")
     private String password;
 
-    @NotEmpty(message = "Debe asignar al menos un rol")
-    private List<Long> rolesIds;
-
     @Size(max = 20, message = "El teléfono no puede exceder 20 caracteres")
     private String telefono;
-
-    /**
-     * Tipo de usuario: 1 = Interno, 2 = Cliente
-     * Por defecto: 1
-     */
-    private Integer tipoUsuario = 1;
 }

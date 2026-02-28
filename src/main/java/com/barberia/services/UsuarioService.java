@@ -1,5 +1,6 @@
 package com.barberia.services;
 
+import com.barberia.dto.usuario.UsuarioPerfilRequest;
 import com.barberia.dto.usuario.UsuarioRequest;
 import com.barberia.dto.usuario.UsuarioResponse;
 import com.barberia.dto.usuario.UsuarioUpdateRequest;
@@ -77,6 +78,7 @@ public class UsuarioService {
             throw new RuntimeException("No tiene permisos para ver este usuario");
         }
 
+        System.out.println("Usuario encontrado: " + usuario.getEmail() + " con negocioId: " + usuario.getNegocioId());
         return usuarioMapper.toResponse(usuario);
     }
 
@@ -166,5 +168,26 @@ public class UsuarioService {
 
         usuario.setRegEstado(1);
         usuarioRepository.save(usuario);
+    }
+
+    @Transactional
+    public UsuarioResponse updatePerfil(Long id, UsuarioPerfilRequest request) {
+        Long negocioId = securityContextService.getNegocioIdFromContext();
+
+        Usuario usuario = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario no encontrado con ID: " + id));
+
+        if (!usuario.getNegocioId().equals(negocioId)) {
+            throw new RuntimeException("No tiene permisos para actualizar este perfil");
+        }
+
+        // Verificar que el email no esté en uso por otro usuario
+        Optional<Usuario> conMismoEmail = usuarioRepository.findByEmail(request.getEmail());
+        if (conMismoEmail.isPresent() && !conMismoEmail.get().getId().equals(id)) {
+            throw new RuntimeException("El email ya está siendo usado por otro usuario");
+        }
+
+        usuarioMapper.updatePerfilEntity(usuario, request, passwordEncoder);
+        return usuarioMapper.toResponse(usuarioRepository.save(usuario));
     }
 }

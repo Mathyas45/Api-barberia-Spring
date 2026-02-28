@@ -44,6 +44,7 @@ public class ServicioMapper {
         response.setEstado(servicio.isEstado());
         response.setNombre(servicio.getNombre());
         response.setDescripcion(servicio.getDescripcion());
+        response.setImagenUrl(servicio.getImagenUrl());
         response.setCategoria(categoriaMapper.toResponse(servicio.getCategoria()));
         response.setPrecio(servicio.getPrecio());
         response.setRegEstado(servicio.getRegEstado());

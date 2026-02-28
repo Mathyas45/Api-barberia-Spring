@@ -46,3 +46,6 @@ application-local.properties
 *.env.yml
 *.credentials.yml
 *.md
+
+### Archivos subidos (logos, imágenes, etc.) ###
+uploads/

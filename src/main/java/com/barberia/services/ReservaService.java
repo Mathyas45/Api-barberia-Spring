@@ -245,7 +245,15 @@ public class ReservaService {
     public List<ReservaResponse> findAll(Long profesionalId, Long clienteId, LocalDate fechaDesde, LocalDate fechaHasta, String estado) {
         // MULTI-TENANT: Obtener negocioId del JWT
         Long negocioId = securityContextService.getNegocioIdFromContext();
-        
+
+        // Validación: si ambas fechas vienen informadas, fechaDesde debe ser <= fechaHasta
+        if (fechaDesde != null && fechaHasta != null && fechaDesde.isAfter(fechaHasta)) {
+            throw new RuntimeException("La fecha desde no puede ser mayor que la fecha hasta.");
+        }
+
+        // Los filtros son completamente opcionales.
+        // Si no vienen fechas, el repositorio devuelve todas las reservas del negocio.
+        // El frontend es responsable de enviar el rango correcto según el modo de vista.
         List<Reserva> reservas = reservaRepository.findByFilters(negocioId, profesionalId, clienteId, fechaDesde, fechaHasta, estado);
         return reservas.stream()
                 .map(reservaMapper::toResponse)

@@ -48,7 +48,7 @@ public class HorarioProfesionalController {
         }
     }
 
-    @GetMapping("/{id}")
+    @GetMapping("/byIdHorario/{id}")
     @PreAuthorize("hasRole('ADMIN') or  hasAuthority('READ_PROFESSIONAL_SCHEDULES')")
     public ResponseEntity<ApiResponse<HorarioProfesionalResponse>> findById(@PathVariable Long id){
         try {
@@ -72,11 +72,11 @@ public class HorarioProfesionalController {
         }
     }
 
-    @GetMapping // Cambiar la ruta para evitar conflicto
+    @GetMapping("/{id}")
     @PreAuthorize("hasRole('ADMIN') or  hasAuthority('READ_PROFESSIONAL_SCHEDULES')")
-    public ResponseEntity<ApiResponse<List<HorarioProfesionalResponse>>> findAll(@RequestParam(required = false) Long profesionalId, @RequestParam(required = false) DiaSemana diaSemana) {
+    public ResponseEntity<ApiResponse<List<HorarioProfesionalResponse>>> findAll(@PathVariable("id") Long profesionalId) {
         try {
-            List<HorarioProfesionalResponse> horariosProfesionales = horarioProfesionalService.findAll(profesionalId, diaSemana);
+            List<HorarioProfesionalResponse> horariosProfesionales = horarioProfesionalService.findAll(profesionalId);
             return ResponseEntity.ok(
                     ApiResponse.<List<HorarioProfesionalResponse>>builder()
                             .code(200)

@@ -32,6 +32,9 @@ public class Servicio {
     @Column(columnDefinition = "TEXT")
     private String descripcion;
 
+    @Column(name = "imagen_url", length = 500)
+    private String imagenUrl;
+
     @Column(name = "duracion_minutos_aprox")
     private Integer duracionMinutosAprox;
 

@@ -13,6 +13,9 @@ public class ProfesionalResponse {
     public Integer edad;
     public String telefono;
     public String direccion;
+    public String especialidad;
+    public String descripcion;
+    public String fotoUrl;
     public Boolean usaHorarioNegocio;
     public int regEstado;
     public Long usuarioRegistroId;
